@@ -475,9 +475,51 @@ function isFurnaceOnlySelection() {
   return state.desiredSystem.label.startsWith("Gas Furnace Only") || state.desiredSystem.label.startsWith("Oil Furnace Only");
 }
 
+function getRecommendedAndNextSizes(squareFeet) {
+  const recommendedRange = getRecommendedSystemRange(squareFeet);
+  if (!recommendedRange || recommendedRange.length === 0) {
+    return { recommended: null, next: null };
+  }
+
+  const recommended = recommendedRange[0];
+  const recommendedIndex = systemSizeReference.findIndex((item) => item.ton === recommended.ton);
+  const next =
+    recommendedIndex >= 0 && recommendedIndex < systemSizeReference.length - 1
+      ? systemSizeReference[recommendedIndex + 1]
+      : null;
+
+  return { recommended, next };
+}
+
+function getSelectedSystemViewLabel() {
+  if (!state.desiredSystem) {
+    return "Systems";
+  }
+
+  if (state.desiredSystem.targetType === "Heat Pump") {
+    return "Heat Pumps";
+  }
+
+  if (state.desiredSystem.targetType === "Gas Furnace") {
+    return "Gas Furnaces";
+  }
+
+  if (state.desiredSystem.targetType === "Oil Furnace") {
+    return "Oil Furnaces";
+  }
+
+  if (state.desiredSystem.targetType === "Fan Coil") {
+    return "Fan Coils";
+  }
+
+  return "Systems";
+}
+
 function buildSizingMarkup() {
   const recommendedSystems = getRecommendedSystemRange(state.homeSquareFeet);
   const recommendedFurnaceOnly = getRecommendedFurnaceOnlyRange(state.homeSquareFeet);
+  const { recommended, next } = getRecommendedAndNextSizes(state.homeSquareFeet);
+  const selectedLabel = getSelectedSystemViewLabel();
 
   if (!recommendedSystems) {
     return "";
@@ -502,11 +544,22 @@ function buildSizingMarkup() {
     `
     : "";
 
+  const viewButtonsMarkup =
+    state.desiredSystem && recommended
+      ? `
+      <div class="option-row sizing-actions">
+        <button class="primary-btn" type="button" data-role="view-recommended-size">View ${recommended.ton} ${selectedLabel}</button>
+        ${next ? `<button class="secondary-btn" type="button" data-role="view-next-size">View ${next.ton} ${selectedLabel}</button>` : ""}
+      </div>
+    `
+      : "";
+
   return `
     <section class="sizing-panel">
       <h3 class="sizing-title">Estimated System Size Range</h3>
       <p class="panel-subtitle">Based on ${state.homeSquareFeet} sq ft and typical local residential assumptions (average insulation, 8–9 ft ceilings).</p>
       <ul class="sizing-list">${systemRows}</ul>
+      ${viewButtonsMarkup}
       ${furnaceSection}
       <p class="panel-subtitle"><strong>Important Disclaimer:</strong> Estimated system size only. Actual HVAC sizing depends on insulation levels, window area, home orientation, ceiling height, duct design, infiltration, local climate, and a Manual J load calculation. A contractor should verify sizing before installation.</p>
       <p class="panel-subtitle"><strong>Sizing & Pricing Disclaimer:</strong> The system sizes and pricing shown here are based on the square footage information you provided and typical sizing guidelines for homes in our area. Once you’ve selected the system you’d like, you can schedule your free verification and sizing appointment online with The Heating and Cooling Guys. During this visit, we’ll confirm the equipment selection and installation details. As long as no additional issues or installation requirements are discovered, the pricing shown here will remain accurate. If any adjustments are needed, we’ll review them with you before moving forward.</p>
@@ -551,6 +604,16 @@ function renderFinalStep() {
   const sizingMarkup = buildSizingMarkup();
   if (sizingMarkup) {
     wizard.insertAdjacentHTML("beforeend", sizingMarkup);
+
+    const recommendedBtn = wizard.querySelector('[data-role="view-recommended-size"]');
+    if (recommendedBtn) {
+      recommendedBtn.addEventListener("click", renderContactPage);
+    }
+
+    const nextBtn = wizard.querySelector('[data-role="view-next-size"]');
+    if (nextBtn) {
+      nextBtn.addEventListener("click", renderContactPage);
+    }
   }
 }
 
