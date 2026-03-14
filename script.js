@@ -534,6 +534,31 @@ function isFurnaceOnlySelection() {
   return state.desiredSystem.label.startsWith("Gas Furnace Only") || state.desiredSystem.label.startsWith("Oil Furnace Only");
 }
 
+
+function isFurnaceBasedSelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return state.desiredSystem.targetType === "Gas Furnace" || state.desiredSystem.targetType === "Oil Furnace";
+}
+
+function getRecommendedAndNextFurnaceOutputs(squareFeet) {
+  const recommendedRange = getRecommendedFurnaceOnlyRange(squareFeet);
+  if (!recommendedRange || recommendedRange.length === 0) {
+    return { recommended: null, next: null };
+  }
+
+  const recommended = recommendedRange[0];
+  const recommendedIndex = furnaceOnlyReference.findIndex((item) => item.output === recommended.output);
+  const next =
+    recommendedIndex >= 0 && recommendedIndex < furnaceOnlyReference.length - 1
+      ? furnaceOnlyReference[recommendedIndex + 1]
+      : null;
+
+  return { recommended, next };
+}
+
 function getRecommendedAndNextSizes(squareFeet) {
   const recommendedRange = getRecommendedSystemRange(squareFeet);
   if (!recommendedRange || recommendedRange.length === 0) {
@@ -578,6 +603,9 @@ function buildSizingMarkup() {
   const recommendedSystems = getRecommendedSystemRange(state.homeSquareFeet);
   const recommendedFurnaceOnly = getRecommendedFurnaceOnlyRange(state.homeSquareFeet);
   const { recommended, next } = getRecommendedAndNextSizes(state.homeSquareFeet);
+  const { recommended: recommendedFurnaceOutput, next: nextFurnaceOutput } = getRecommendedAndNextFurnaceOutputs(
+    state.homeSquareFeet,
+  );
   const selectedLabel = getSelectedSystemViewLabel();
 
   if (!recommendedSystems) {
@@ -603,15 +631,31 @@ function buildSizingMarkup() {
     `
     : "";
 
-  const viewButtonsMarkup =
-    state.desiredSystem && recommended
-      ? `
+  const viewButtonsMarkup = (() => {
+    if (!state.desiredSystem) {
+      return "";
+    }
+
+    if (isFurnaceBasedSelection() && recommendedFurnaceOutput) {
+      return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${recommendedFurnaceOutput.output} ${selectedLabel}</button>
+        ${nextFurnaceOutput ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${nextFurnaceOutput.output} ${selectedLabel}</button>` : ""}
+      </div>
+    `;
+    }
+
+    if (recommended) {
+      return `
       <div class="option-row sizing-actions">
         <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${recommended.ton} ${selectedLabel}</button>
         ${next ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${next.ton} ${selectedLabel}</button>` : ""}
       </div>
-    `
-      : "";
+    `;
+    }
+
+    return "";
+  })();
 
   return `
     <section class="sizing-panel">
