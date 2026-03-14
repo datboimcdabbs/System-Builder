@@ -1,7 +1,7 @@
 const wizard = document.getElementById("wizard");
 
 const ductworkPresenceOptions = [
-  { label: "Yes", image: "assets/ductwork-yes.svg", value: true },
+  { label: "Yes", image: "https://www.novakheating.com/wp-content/webp-express/webp-images/uploads/2022/09/Novak_Ducts-vs.-Vents-1.png.webp", value: true },
   { label: "No", image: "assets/ductwork-no.svg", value: false },
 ];
 
