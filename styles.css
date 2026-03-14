@@ -163,6 +163,19 @@ textarea {
   grid-template-columns: 1fr;
 }
 
+
+.thumbnail-grid--xl {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.thumbnail-grid--xl .thumbnail-card img {
+  height: 180px;
+}
+
+.thumbnail-grid--xl .thumbnail-card span {
+  font-size: 1rem;
+}
+
 .expand-copy {
   margin-top: -0.35rem;
   margin-bottom: 0.5rem;

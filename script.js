@@ -52,6 +52,24 @@ const ductConditionOptions = [
   },
 ];
 
+const gasEfficiencyOptions = [
+  {
+    key: "standard",
+    label: "Standard Efficiency Gas Furnace",
+    image: "assets/gas-standard-efficiency.svg",
+  },
+  {
+    key: "high",
+    label: "High Efficiency Gas Furnace",
+    image: "assets/gas-high-efficiency.svg",
+  },
+  {
+    key: "upgrade",
+    label: "I have a Standard Gas Furnace But I want a High Efficiency Upgrade",
+    image: "assets/gas-high-upgrade.svg",
+  },
+];
+
 const desiredDuctedSystems = systemsWithDuctwork.map((item) => ({
   ...item,
   label: `${item.label} (Using Your Existing Ductwork)`,
@@ -68,6 +86,10 @@ const state = {
   currentSystem: null,
   currentFuelType: null,
   currentTargetType: null,
+  desiredSystem: null,
+  conversionPageTitle: null,
+  gasEfficiency: null,
+  homeSquareFeet: null,
 };
 
 function clearWizard() {
@@ -142,11 +164,19 @@ function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMa
   wizard.appendChild(template);
 }
 
+function resetDuctedPathState() {
+  state.desiredSystem = null;
+  state.conversionPageTitle = null;
+  state.gasEfficiency = null;
+  state.homeSquareFeet = null;
+}
+
 function renderStart() {
   state.hasDuctwork = null;
   state.currentSystem = null;
   state.currentFuelType = null;
   state.currentTargetType = null;
+  resetDuctedPathState();
 
   renderThumbnailQuestion({
     title: "Does your Heating/Cooling system use Ductwork and registers to keep your air comfortable?",
@@ -173,6 +203,7 @@ function renderCurrentSystemQuestion() {
         state.currentSystem = option.label;
         state.currentFuelType = option.fuelType || null;
         state.currentTargetType = option.targetType || null;
+        resetDuctedPathState();
 
         if (state.hasDuctwork) {
           renderDuctCondition();
@@ -210,6 +241,19 @@ function getConversionPageTitle(targetSystem) {
   return `${fromLabel} to ${toLabel} Page`;
 }
 
+function isGasSystemSelection() {
+  return state.currentSystem === "A/C and Gas Furnace" || state.currentSystem === "Gas Furnace Only";
+}
+
+function continueToSizingFlow() {
+  if (isGasSystemSelection() && !state.gasEfficiency) {
+    renderGasEfficiencyQuestion();
+    return;
+  }
+
+  renderHomeSizeQuestion();
+}
+
 function renderDesiredDuctedSystem() {
   renderThumbnailQuestion({
     title: "What type of system are you looking to get installed?",
@@ -217,11 +261,17 @@ function renderDesiredDuctedSystem() {
     options: desiredDuctedSystems.map((option) => ({
       ...option,
       onClick: () => {
+        state.desiredSystem = option;
+        state.homeSquareFeet = null;
+
         if (isDirectReplacement(option)) {
-          renderFinalStep(option.label);
+          state.conversionPageTitle = null;
+          renderDuctedSelectionPage();
           return;
         }
-        renderSystemConversionPage(option);
+
+        state.conversionPageTitle = getConversionPageTitle(option);
+        renderSystemConversionPage();
       },
     })),
     onBack: renderDuctCondition,
@@ -229,13 +279,30 @@ function renderDesiredDuctedSystem() {
   });
 }
 
-function renderSystemConversionPage(targetSystem) {
+function renderDuctedSelectionPage() {
   clearWizard();
-  const title = getConversionPageTitle(targetSystem);
-  const desiredLabel = targetSystem.label.replace(" (Using Your Existing Ductwork)", "");
+  wizard.innerHTML = `
+    <h2 class="panel-title">Selected System Path</h2>
+    <p class="panel-subtitle">
+      You currently have <strong>${state.currentSystem}</strong> and selected
+      <strong>${state.desiredSystem.label.replace(" (Using Your Existing Ductwork)", "")}</strong>.
+    </p>
+    <div class="option-row">
+      <button class="primary-btn" type="button" data-role="to-sizing">Continue to System Selection</button>
+      <button class="secondary-btn" type="button" data-role="to-desired">Back to System Choices</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", continueToSizingFlow);
+  wizard.querySelector('[data-role="to-desired"]').addEventListener("click", renderDesiredDuctedSystem);
+}
+
+function renderSystemConversionPage() {
+  clearWizard();
+  const desiredLabel = state.desiredSystem.label.replace(" (Using Your Existing Ductwork)", "");
 
   wizard.innerHTML = `
-    <h2 class="panel-title">${title}</h2>
+    <h2 class="panel-title">${state.conversionPageTitle}</h2>
     <p class="panel-subtitle">
       You currently have <strong>${state.currentSystem}</strong> and selected
       <strong>${desiredLabel}</strong>.
@@ -245,20 +312,133 @@ function renderSystemConversionPage(targetSystem) {
       we’ll confirm design requirements, equipment compatibility, electrical/fuel updates, and available rebates.
     </p>
     <div class="option-row">
-      <button class="primary-btn" type="button" data-role="to-contact">Continue to Contact Us</button>
+      <button class="primary-btn" type="button" data-role="to-sizing">Continue to System Selection</button>
       <button class="secondary-btn" type="button" data-role="to-desired">Back to System Choices</button>
     </div>
   `;
 
-  wizard.querySelector('[data-role="to-contact"]').addEventListener("click", renderContactPage);
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", continueToSizingFlow);
   wizard.querySelector('[data-role="to-desired"]').addEventListener("click", renderDesiredDuctedSystem);
 }
 
-function renderFinalStep(selectedSystem) {
+function renderGasEfficiencyQuestion() {
+  renderThumbnailQuestion({
+    title: "What gas furnace efficiency do you currently have?",
+    subtitle: "Choose the option that best matches your current gas setup.",
+    options: gasEfficiencyOptions.map((option) => ({
+      ...option,
+      onClick: () => {
+        if (option.key === "upgrade") {
+          renderHighEfficiencyUpgradePage();
+          return;
+        }
+
+        state.gasEfficiency = option.key;
+        renderHomeSizeQuestion();
+      },
+    })),
+    onBack: () => {
+      if (state.conversionPageTitle) {
+        renderSystemConversionPage();
+      } else {
+        renderDuctedSelectionPage();
+      }
+    },
+    cardClass: "thumbnail-grid--xl",
+  });
+}
+
+function renderHighEfficiencyUpgradePage() {
+  clearWizard();
+  state.gasEfficiency = "standard_to_high_upgrade";
+  wizard.innerHTML = `
+    <h2 class="panel-title">High Efficiency Furnace Upgrade Page</h2>
+    <p class="panel-subtitle">
+      Great choice. We’ll evaluate venting updates, condensate handling, and airflow requirements needed
+      for a high-efficiency gas furnace upgrade.
+    </p>
+    <div class="option-row">
+      <button class="primary-btn" type="button" data-role="to-sizing">Continue to System Sizing</button>
+      <button class="secondary-btn" type="button" data-role="to-efficiency">Back to Efficiency Options</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", renderHomeSizeQuestion);
+  wizard.querySelector('[data-role="to-efficiency"]').addEventListener("click", renderGasEfficiencyQuestion);
+}
+
+function renderHomeSizeQuestion() {
+  clearWizard();
+  wizard.innerHTML = `
+    <h2 class="panel-title">What size home do you have?</h2>
+    <p class="panel-subtitle">Enter your home size in square feet so we can prepare system sizing guidance.</p>
+    <form class="contact-form" data-role="size-form">
+      <label>
+        Home Size (Square Feet)
+        <input required name="squareFeet" type="number" min="300" step="1" placeholder="e.g., 2200" />
+      </label>
+      <button class="primary-btn" type="submit">Continue</button>
+    </form>
+    <button class="secondary-btn" type="button" data-role="back-button">Back</button>
+  `;
+
+  const form = wizard.querySelector('[data-role="size-form"]');
+  const input = form.querySelector('input[name="squareFeet"]');
+  if (state.homeSquareFeet) {
+    input.value = state.homeSquareFeet;
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    state.homeSquareFeet = input.value;
+    renderFinalStep();
+  });
+
+  wizard.querySelector('[data-role="back-button"]').addEventListener("click", () => {
+    if (isGasSystemSelection()) {
+      renderGasEfficiencyQuestion();
+      return;
+    }
+
+    if (state.conversionPageTitle) {
+      renderSystemConversionPage();
+      return;
+    }
+
+    renderDuctedSelectionPage();
+  });
+}
+
+function renderFinalStep() {
   clearWizard();
   const template = document.getElementById("final-template").content.cloneNode(true);
-  template.querySelector('[data-role="summary"]').textContent =
-    `You selected: ${selectedSystem}. We also noted your current system as ${state.currentSystem}.`;
+  const summary = [];
+
+  if (state.desiredSystem) {
+    summary.push(`You selected: ${state.desiredSystem.label}.`);
+  }
+
+  if (state.currentSystem) {
+    summary.push(`Current system: ${state.currentSystem}.`);
+  }
+
+  if (state.homeSquareFeet) {
+    summary.push(`Home size: ${state.homeSquareFeet} sq ft.`);
+  }
+
+  if (state.gasEfficiency === "standard") {
+    summary.push("Gas furnace efficiency noted: Standard.");
+  } else if (state.gasEfficiency === "high") {
+    summary.push("Gas furnace efficiency noted: High.");
+  } else if (state.gasEfficiency === "standard_to_high_upgrade") {
+    summary.push("Requested path: Standard gas furnace to high-efficiency upgrade.");
+  }
+
+  if (state.conversionPageTitle) {
+    summary.push(`Conversion path: ${state.conversionPageTitle.replace(" Page", "")}.`);
+  }
+
+  template.querySelector('[data-role="summary"]').textContent = summary.join(" ");
   template.querySelector('[data-role="contact-button"]').addEventListener("click", renderContactPage);
   template.querySelector('[data-role="restart-button"]').addEventListener("click", renderStart);
   wizard.appendChild(template);

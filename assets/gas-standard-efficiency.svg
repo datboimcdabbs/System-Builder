@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" fill="none">
+<defs><linearGradient id="g" x1="0" y1="0" x2="640" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#0C2643"/><stop offset="1" stop-color="#1D5B8C"/></linearGradient></defs>
+<rect width="640" height="360" rx="24" fill="url(#g)"/>
+<rect x="70" y="60" width="500" height="240" rx="24" fill="#0A1528" stroke="#87D7FF" stroke-width="4"/>
+<rect x="110" y="108" width="180" height="140" rx="18" fill="#1D3E63"/>
+<rect x="320" y="112" width="200" height="26" rx="13" fill="#2E6A9B"/>
+<rect x="320" y="154" width="160" height="18" rx="9" fill="#2E6A9B"/>
+<rect x="320" y="186" width="130" height="18" rx="9" fill="#2E6A9B"/>
+<text x="95" y="286" fill="#8EE6FF" font-size="34" font-family="Segoe UI,Arial,sans-serif" font-weight="700">Standard Gas</text>
+</svg>
