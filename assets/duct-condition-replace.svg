@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" fill="none">
+<defs><linearGradient id="g" x1="0" y1="0" x2="640" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#0C2643"/><stop offset="1" stop-color="#1D5B8C"/></linearGradient></defs>
+<rect width="640" height="360" rx="24" fill="url(#g)"/>
+<rect x="70" y="60" width="500" height="240" rx="24" fill="#0A1528" stroke="#87D7FF" stroke-width="4"/>
+<rect x="120" y="110" width="100" height="36" rx="12" fill="#2E6A9B"/>
+<rect x="220" y="128" width="200" height="18" rx="9" fill="#2E6A9B"/>
+<rect x="120" y="175" width="300" height="18" rx="9" fill="#2E6A9B"/>
+<rect x="120" y="220" width="220" height="18" rx="9" fill="#2E6A9B"/>
+<text x="95" y="285" fill="#8EE6FF" font-size="34" font-family="Segoe UI,Arial,sans-serif" font-weight="700">Likely Replace Ducts</text>
+</svg>

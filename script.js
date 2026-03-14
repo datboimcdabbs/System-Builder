@@ -1,5 +1,10 @@
 const wizard = document.getElementById("wizard");
 
+const ductworkPresenceOptions = [
+  { label: "Yes", image: "assets/ductwork-yes.svg", value: true },
+  { label: "No", image: "assets/ductwork-no.svg", value: false },
+];
+
 const systemsWithDuctwork = [
   { label: "Heat Pump System", image: "assets/heat-pump.svg" },
   { label: "A/C and Gas Furnace", image: "assets/ac-gas-furnace.svg" },
@@ -17,6 +22,26 @@ const systemsWithoutDuctwork = [
   { label: "Mini Split (Indoor and Outdoor Units)", image: "assets/mini-split.svg" },
 ];
 
+const ductConditionOptions = [
+  {
+    label: "Yes, I believe my ductwork is in usable condition.",
+    image: "assets/duct-condition-good.svg",
+    onSelect: () => renderDesiredDuctedSystem(),
+  },
+  {
+    label: "I think it is good, but I want to make sure first.",
+    image: "assets/duct-condition-check.svg",
+    expandableCopy:
+      "We always confirm the ductwork during your free Pre-Install Verification appointment, to make sure that your existing ducts can provide the best comfort with your new system!",
+    onSelect: () => renderDesiredDuctedSystem(),
+  },
+  {
+    label: "I believe that some or all of my ductwork may need to be replaced.",
+    image: "assets/duct-condition-replace.svg",
+    onSelect: () => renderContactPage(),
+  },
+];
+
 const desiredDuctedSystems = systemsWithDuctwork.map((item) => ({
   ...item,
   label: `${item.label} (Using Your Existing Ductwork)`,
@@ -31,116 +56,86 @@ function clearWizard() {
   wizard.innerHTML = "";
 }
 
-function renderBinaryQuestion({ title, subtitle, options }) {
-  clearWizard();
-  const template = document.getElementById("binary-question-template").content.cloneNode(true);
-  template.querySelector(".panel-title").textContent = title;
-  template.querySelector(".panel-subtitle").textContent = subtitle || "";
-  const row = template.querySelector('[data-role="binary-options"]');
+function createThumbnailCard(option, highlightMatcher) {
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = "thumbnail-card";
 
-  options.forEach((option) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "choice-btn";
-    button.textContent = option.label;
-    button.addEventListener("click", option.onClick);
-    row.appendChild(button);
-  });
+  if (highlightMatcher && highlightMatcher(option)) {
+    const badge = document.createElement("span");
+    badge.className = "direct-badge";
+    badge.textContent = "Direct Replacement";
+    card.appendChild(badge);
+  }
 
-  wizard.appendChild(template);
+  const img = document.createElement("img");
+  img.src = option.image;
+  img.alt = option.label;
+
+  const text = document.createElement("span");
+  text.textContent = option.label;
+
+  card.append(img, text);
+  return card;
 }
 
-function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMatcher }) {
+function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMatcher, cardClass }) {
   clearWizard();
   const template = document.getElementById("thumbnail-question-template").content.cloneNode(true);
   template.querySelector(".panel-title").textContent = title;
-  template.querySelector(".panel-subtitle").textContent = subtitle;
+  template.querySelector(".panel-subtitle").textContent = subtitle || "";
   const grid = template.querySelector('[data-role="thumbnail-options"]');
+  if (cardClass) grid.classList.add(cardClass);
 
   options.forEach((option) => {
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "thumbnail-card";
-
-    if (highlightMatcher && highlightMatcher(option)) {
-      const badge = document.createElement("span");
-      badge.className = "direct-badge";
-      badge.textContent = "Direct Replacement";
-      card.appendChild(badge);
-    }
-
-    const img = document.createElement("img");
-    img.src = option.image;
-    img.alt = option.label;
-    const text = document.createElement("span");
-    text.textContent = option.label;
-
-    card.append(img, text);
+    const card = createThumbnailCard(option, highlightMatcher);
     card.addEventListener("click", option.onClick);
     grid.appendChild(card);
+
+    if (option.expandableCopy) {
+      const expandable = document.createElement("div");
+      expandable.className = "expand-copy";
+      expandable.hidden = true;
+      expandable.innerHTML = `
+        <p>${option.expandableCopy}</p>
+        <button class="primary-btn" type="button">Continue</button>
+      `;
+      expandable.querySelector("button").addEventListener("click", (event) => {
+        event.stopPropagation();
+        option.onClick();
+      });
+      card.addEventListener("click", () => {
+        expandable.hidden = !expandable.hidden;
+      });
+      grid.appendChild(expandable);
+    }
   });
 
-  template.querySelector('[data-role="back-button"]').addEventListener("click", onBack);
+  const backBtn = template.querySelector('[data-role="back-button"]');
+  if (onBack) {
+    backBtn.addEventListener("click", onBack);
+  } else {
+    backBtn.remove();
+  }
+
   wizard.appendChild(template);
 }
 
-function renderDuctCondition() {
-  clearWizard();
-  const template = document.getElementById("duct-check-template").content.cloneNode(true);
-  const stack = template.querySelector('[data-role="duct-options"]');
-
-  const addOption = ({ label, onClick, expandableCopy }) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "duct-option";
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "duct-option-btn";
-    button.textContent = label;
-    button.addEventListener("click", () => {
-      if (!expandableCopy) {
-        onClick();
-        return;
-      }
-
-      const existing = wrapper.querySelector(".expand-copy");
-      if (existing) {
-        existing.remove();
-        return;
-      }
-
-      const expandable = document.createElement("div");
-      expandable.className = "expand-copy";
-      expandable.innerHTML = `
-        <p>We always confirm the ductwork during your free Pre-Install Verification appointment, to make sure that your existing ducts can provide the best comfort with your new system!</p>
-        <button class="primary-btn" type="button">Continue</button>
-      `;
-      expandable.querySelector("button").addEventListener("click", onClick);
-      wrapper.appendChild(expandable);
-    });
-
-    wrapper.appendChild(button);
-    stack.appendChild(wrapper);
-  };
-
-  addOption({
-    label: "Yes, I believe my ductwork is in usable condition.",
-    onClick: renderDesiredDuctedSystem,
+function renderStart() {
+  state.hasDuctwork = null;
+  state.currentSystem = null;
+  renderThumbnailQuestion({
+    title: "Does your Heating/Cooling system use Ductwork and registers to keep your air comfortable?",
+    subtitle: "Choose the option that best matches your home.",
+    options: ductworkPresenceOptions.map((option) => ({
+      ...option,
+      onClick: () => {
+        state.hasDuctwork = option.value;
+        renderCurrentSystemQuestion();
+      },
+    })),
+    onBack: null,
   });
-
-  addOption({
-    label: "I think it is good, but I want to make sure first.",
-    onClick: renderDesiredDuctedSystem,
-    expandableCopy: true,
-  });
-
-  addOption({
-    label: "I believe that some or all of my ductwork may need to be replaced.",
-    onClick: renderContactPage,
-  });
-
-  template.querySelector('[data-role="back-button"]').addEventListener("click", renderCurrentSystemQuestion);
-  wizard.appendChild(template);
 }
 
 function renderCurrentSystemQuestion() {
@@ -160,6 +155,20 @@ function renderCurrentSystemQuestion() {
       },
     })),
     onBack: renderStart,
+  });
+}
+
+function renderDuctCondition() {
+  renderThumbnailQuestion({
+    title: "Is your ductwork and registers in usable condition?",
+    subtitle:
+      "All ducted replacement systems qualify for 10 Years of Free Maintenance! We’ve seen it all—some ductwork systems have more holes than my dad’s socks, and some have become a home for a family of raccoons (you would probably know if this applies to you). We have even conducted a cat rescue mission in a customer's ductwork (the cat was upset at us when we pulled her out, but otherwise she’s happy and healthy to this day!).",
+    options: ductConditionOptions.map((option) => ({
+      ...option,
+      onClick: option.onSelect,
+    })),
+    onBack: renderCurrentSystemQuestion,
+    cardClass: "thumbnail-grid--duct-condition",
   });
 }
 
@@ -201,32 +210,6 @@ function renderContactPage() {
 
   template.querySelector('[data-role="restart-button"]').addEventListener("click", renderStart);
   wizard.appendChild(template);
-}
-
-function renderStart() {
-  state.hasDuctwork = null;
-  state.currentSystem = null;
-  renderBinaryQuestion({
-    title:
-      "Does your Heating/Cooling system use Ductwork and registers to keep your air comfortable?",
-    subtitle: "",
-    options: [
-      {
-        label: "Yes",
-        onClick: () => {
-          state.hasDuctwork = true;
-          renderCurrentSystemQuestion();
-        },
-      },
-      {
-        label: "No",
-        onClick: () => {
-          state.hasDuctwork = false;
-          renderCurrentSystemQuestion();
-        },
-      },
-    ],
-  });
 }
 
 renderStart();

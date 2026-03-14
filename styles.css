@@ -4,9 +4,7 @@
   --card-border: rgba(125, 196, 255, 0.3);
   --text: #eaf4ff;
   --muted: #b2c9dd;
-  --accent: #43c5ff;
   --accent-strong: #31f0c7;
-  --danger: #ff9ca7;
 }
 
 * {
@@ -28,12 +26,16 @@ body {
   padding: 2.5rem 1.5rem 3rem;
 }
 
-.hero {
+.hero,
+.wizard-panel {
   background: linear-gradient(140deg, rgba(20, 46, 82, 0.88), rgba(13, 31, 54, 0.92));
   border: 1px solid var(--card-border);
   border-radius: 24px;
-  padding: 2rem;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+}
+
+.hero {
+  padding: 2rem;
 }
 
 .hero-eyebrow {
@@ -56,11 +58,7 @@ body {
 
 .wizard-panel {
   margin-top: 1.5rem;
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 24px;
   padding: 1.5rem;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
 }
 
 .panel-title {
@@ -71,18 +69,7 @@ body {
 .panel-subtitle {
   margin: 0 0 1.2rem;
   color: var(--muted);
-}
-
-.offer-note {
-  color: var(--accent-strong);
-  font-weight: 600;
-}
-
-.option-row {
-  display: flex;
-  gap: 0.9rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+  line-height: 1.45;
 }
 
 button,
@@ -92,19 +79,15 @@ textarea {
 }
 
 .primary-btn,
-.secondary-btn,
-.choice-btn,
-.duct-option-btn {
+.secondary-btn {
   border: 0;
   border-radius: 14px;
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
-.primary-btn,
-.choice-btn,
-.duct-option-btn {
+.primary-btn {
   background: linear-gradient(135deg, #3cc4ff, #5e95ff);
   color: #00142b;
   font-weight: 700;
@@ -119,8 +102,7 @@ textarea {
 
 .primary-btn:hover,
 .secondary-btn:hover,
-.choice-btn:hover,
-.duct-option-btn:hover {
+.thumbnail-card:hover {
   transform: translateY(-2px);
 }
 
@@ -140,6 +122,8 @@ textarea {
   text-align: left;
   color: var(--text);
   cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease;
 }
 
 .thumbnail-card img {
@@ -167,27 +151,22 @@ textarea {
   font-weight: 700;
 }
 
-.stacked-options {
-  display: grid;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.duct-option {
-  border: 1px solid rgba(178, 211, 238, 0.24);
-  background: rgba(13, 38, 66, 0.86);
-  border-radius: 14px;
-  padding: 0.85rem;
-}
-
-.duct-option p {
-  margin: 0;
+.thumbnail-grid--duct-condition {
+  grid-template-columns: 1fr;
 }
 
 .expand-copy {
-  margin-top: 0.7rem;
-  border-top: 1px dashed rgba(177, 205, 227, 0.25);
-  padding-top: 0.75rem;
+  margin-top: -0.35rem;
+  margin-bottom: 0.5rem;
+  border: 1px dashed rgba(177, 205, 227, 0.3);
+  border-radius: 12px;
+  background: rgba(13, 38, 66, 0.5);
+  padding: 0.8rem;
+  color: var(--muted);
+}
+
+.expand-copy p {
+  margin-top: 0;
 }
 
 .contact-form {
