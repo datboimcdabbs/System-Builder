@@ -109,7 +109,9 @@ const state = {
   conversionPageTitle: null,
   gasEfficiency: null,
   homeSquareFeet: null,
-  currentKnownSystemSize: null,
+  knowsCurrentSize: null,
+  currentKnownCoolingSize: null,
+  currentKnownFurnaceSize: null,
 };
 
 function clearWizard() {
@@ -189,7 +191,9 @@ function resetDuctedPathState() {
   state.conversionPageTitle = null;
   state.gasEfficiency = null;
   state.homeSquareFeet = null;
-  state.currentKnownSystemSize = null;
+  state.knowsCurrentSize = null;
+  state.currentKnownCoolingSize = null;
+  state.currentKnownFurnaceSize = null;
 }
 
 function renderStart() {
@@ -284,7 +288,9 @@ function renderDesiredDuctedSystem() {
       onClick: () => {
         state.desiredSystem = option;
         state.homeSquareFeet = null;
-  state.currentKnownSystemSize = null;
+  state.knowsCurrentSize = null;
+  state.currentKnownCoolingSize = null;
+  state.currentKnownFurnaceSize = null;
 
         if (isDirectReplacement(option)) {
           state.conversionPageTitle = null;
@@ -389,77 +395,152 @@ function renderHighEfficiencyUpgradePage() {
   wizard.querySelector('[data-role="to-efficiency"]').addEventListener("click", renderGasEfficiencyQuestion);
 }
 
+function isSplitACAndFurnaceSelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return (
+    state.desiredSystem.label.startsWith("A/C and Gas Furnace") ||
+    state.desiredSystem.label.startsWith("A/C and Oil Furnace")
+  );
+}
+
+function renderKnownSizeOptionButtons({ title, options, dataRole, selectedValue }) {
+  const buttons = options
+    .map(
+      (value) =>
+        `<button class="primary-btn glowing-btn ${selectedValue === value ? "selected-size-btn" : ""}" type="button" data-role="${dataRole}" data-size="${value}">${value}</button>`,
+    )
+    .join("");
+
+  return `
+    <div class="size-options-group">
+      <p class="know-size-subtitle">${title}</p>
+      <div class="option-row know-size-options">${buttons}</div>
+    </div>
+  `;
+}
+
 function renderHomeSizeQuestion() {
   clearWizard();
+  const shouldShowCoolingOptions = !isFurnaceOnlySelection();
+  const shouldShowFurnaceOptions = isFurnaceBasedSelection() || isSplitACAndFurnaceSelection();
+
   wizard.innerHTML = `
-    <h2 class="panel-title">What size home do you have?</h2>
-    <p class="panel-subtitle">Enter your home size in square feet so we can prepare system sizing guidance.</p>
-    <form class="contact-form" data-role="size-form">
-      <label>
-        Home Size (Square Feet)
-        <input required name="squareFeet" type="number" min="300" step="1" placeholder="e.g., 2200" />
-      </label>
-      <div class="know-size-block">
-        <p class="know-size-title">Do you know your current system size?</p>
-        <div class="option-row">
-          <button class="primary-btn glowing-btn" type="button" data-role="know-size-yes">Yes</button>
-          <button class="secondary-btn glowing-btn" type="button" data-role="know-size-no">No</button>
-        </div>
-        <div class="option-row know-size-options" data-role="size-options" hidden>
-          <button class="primary-btn glowing-btn" type="button" data-size="1.5 ton">1.5 Ton</button>
-          <button class="primary-btn glowing-btn" type="button" data-size="2 ton">2 Ton</button>
-          <button class="primary-btn glowing-btn" type="button" data-size="2.5 ton">2.5 Ton</button>
-          <button class="primary-btn glowing-btn" type="button" data-size="3 ton">3 Ton</button>
-          <button class="primary-btn glowing-btn" type="button" data-size="3.5 ton">3.5 Ton</button>
-          <button class="primary-btn glowing-btn" type="button" data-size="4 ton">4 Ton</button>
-          <button class="primary-btn glowing-btn" type="button" data-size="5 ton">5 Ton</button>
-        </div>
+    <h2 class="panel-title">System Size Details</h2>
+    <p class="panel-subtitle">Do you know the size of your current system?</p>
+    <div class="know-size-block">
+      <div class="option-row">
+        <button class="primary-btn glowing-btn" type="button" data-role="know-size-yes">Yes, I know my current size</button>
+        <button class="secondary-btn glowing-btn" type="button" data-role="know-size-no">No, use my square footage</button>
       </div>
+      <div data-role="known-size-selections" hidden></div>
+    </div>
+
+    <form class="contact-form" data-role="size-form">
+      <label data-role="sqft-wrapper" hidden>
+        Home Size (Square Feet)
+        <input name="squareFeet" type="number" min="300" step="1" placeholder="e.g., 2200" />
+      </label>
       <button class="primary-btn glowing-btn" type="submit">Continue</button>
     </form>
     <button class="secondary-btn" type="button" data-role="back-button">Back</button>
   `;
 
   const form = wizard.querySelector('[data-role="size-form"]');
+  const sqftWrapper = wizard.querySelector('[data-role="sqft-wrapper"]');
   const input = form.querySelector('input[name="squareFeet"]');
   const knowYesBtn = wizard.querySelector('[data-role="know-size-yes"]');
   const knowNoBtn = wizard.querySelector('[data-role="know-size-no"]');
-  const sizeOptions = wizard.querySelector('[data-role="size-options"]');
+  const knownSizeSelections = wizard.querySelector('[data-role="known-size-selections"]');
 
-  if (state.homeSquareFeet) {
-    input.value = state.homeSquareFeet;
-  }
+  const coolingOptions = ["1.5 ton", "2 ton", "2.5 ton", "3 ton", "3.5 ton", "4 ton", "5 ton"];
+  const furnaceOptions = ["40,000 BTU", "60,000 BTU", "80,000 BTU", "100,000 BTU", "120,000 BTU"];
 
-  if (state.currentKnownSystemSize) {
-    sizeOptions.hidden = false;
-  }
-
-  knowYesBtn.addEventListener("click", () => {
-    sizeOptions.hidden = false;
-  });
-
-  knowNoBtn.addEventListener("click", () => {
-    sizeOptions.hidden = true;
-    state.currentKnownSystemSize = null;
-  });
-
-  sizeOptions.querySelectorAll('button[data-size]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.currentKnownSystemSize = btn.getAttribute('data-size');
-      sizeOptions.querySelectorAll('button[data-size]').forEach((otherBtn) => {
-        otherBtn.classList.remove('selected-size-btn');
+  function renderKnownSizeSelectors() {
+    let markup = "";
+    if (shouldShowCoolingOptions) {
+      markup += renderKnownSizeOptionButtons({
+        title: "Current A/C / Heat Pump Size",
+        options: coolingOptions,
+        dataRole: "known-cooling-size",
+        selectedValue: state.currentKnownCoolingSize,
       });
-      btn.classList.add('selected-size-btn');
+    }
+
+    if (shouldShowFurnaceOptions) {
+      markup += renderKnownSizeOptionButtons({
+        title: "Current Furnace Size",
+        options: furnaceOptions,
+        dataRole: "known-furnace-size",
+        selectedValue: state.currentKnownFurnaceSize,
+      });
+    }
+
+    knownSizeSelections.innerHTML = markup;
+
+    knownSizeSelections.querySelectorAll('button[data-role="known-cooling-size"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.currentKnownCoolingSize = btn.getAttribute("data-size");
+        renderKnownSizeSelectors();
+      });
     });
 
-    if (state.currentKnownSystemSize === btn.getAttribute('data-size')) {
-      btn.classList.add('selected-size-btn');
+    knownSizeSelections.querySelectorAll('button[data-role="known-furnace-size"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.currentKnownFurnaceSize = btn.getAttribute("data-size");
+        renderKnownSizeSelectors();
+      });
+    });
+  }
+
+  function enableKnownSizeMode() {
+    state.knowsCurrentSize = true;
+    sqftWrapper.hidden = true;
+    input.required = false;
+    knownSizeSelections.hidden = false;
+    renderKnownSizeSelectors();
+  }
+
+  function enableSquareFootageMode() {
+    state.knowsCurrentSize = false;
+    state.currentKnownCoolingSize = null;
+    state.currentKnownFurnaceSize = null;
+    knownSizeSelections.hidden = true;
+    sqftWrapper.hidden = false;
+    input.required = true;
+  }
+
+  if (state.knowsCurrentSize === true) {
+    enableKnownSizeMode();
+  } else {
+    enableSquareFootageMode();
+    if (state.homeSquareFeet) {
+      input.value = state.homeSquareFeet;
     }
-  });
+  }
+
+  knowYesBtn.addEventListener("click", enableKnownSizeMode);
+  knowNoBtn.addEventListener("click", enableSquareFootageMode);
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    state.homeSquareFeet = input.value;
+
+    if (state.knowsCurrentSize) {
+      const needsCooling = shouldShowCoolingOptions && !state.currentKnownCoolingSize;
+      const needsFurnace = shouldShowFurnaceOptions && !state.currentKnownFurnaceSize;
+      if (needsCooling || needsFurnace) {
+        return;
+      }
+      state.homeSquareFeet = null;
+    } else {
+      state.homeSquareFeet = input.value;
+      if (!state.homeSquareFeet) {
+        return;
+      }
+    }
+
     renderFinalStep();
   });
 
@@ -600,29 +681,33 @@ function getSelectedSystemViewLabel() {
 }
 
 function buildSizingMarkup() {
-  const recommendedSystems = getRecommendedSystemRange(state.homeSquareFeet);
-  const recommendedFurnaceOnly = getRecommendedFurnaceOnlyRange(state.homeSquareFeet);
+  const recommendedSystems = state.homeSquareFeet ? getRecommendedSystemRange(state.homeSquareFeet) : [];
+  const recommendedFurnaceOnly = state.homeSquareFeet ? getRecommendedFurnaceOnlyRange(state.homeSquareFeet) : [];
   const { recommended, next } = getRecommendedAndNextSizes(state.homeSquareFeet);
   const { recommended: recommendedFurnaceOutput, next: nextFurnaceOutput } = getRecommendedAndNextFurnaceOutputs(
     state.homeSquareFeet,
   );
   const selectedLabel = getSelectedSystemViewLabel();
 
-  if (!recommendedSystems) {
+  if (recommendedSystems.length === 0 && !state.currentKnownCoolingSize && !state.currentKnownFurnaceSize) {
     return "";
   }
 
-  const systemRows = recommendedSystems
-    .map((item) => {
-      const baseLine = `<strong>${item.ton}</strong> (${item.coolingBTU}) · Typical home: ${item.homeMin}–${item.homeMax} sq ft`;
-      const includeFurnaceRange = !isHeatPumpSelection();
-      return `<li>${baseLine}${includeFurnaceRange ? ` · Typical furnace range: ${item.furnaceRange}` : ""}</li>`;
-    })
-    .join("");
+  const systemRows = state.currentKnownCoolingSize
+    ? `<li><strong>${state.currentKnownCoolingSize}</strong> (customer provided current cooling size)</li>`
+    : recommendedSystems
+        .map((item) => {
+          const baseLine = `<strong>${item.ton}</strong> (${item.coolingBTU}) · Typical home: ${item.homeMin}–${item.homeMax} sq ft`;
+          const includeFurnaceRange = !isHeatPumpSelection();
+          return `<li>${baseLine}${includeFurnaceRange ? ` · Typical furnace range: ${item.furnaceRange}` : ""}</li>`;
+        })
+        .join("");
 
-  const furnaceRows = (recommendedFurnaceOnly || [])
-    .map((item) => `<li><strong>${item.output}</strong> · Typical home: ${item.homeMin}–${item.homeMax} sq ft</li>`)
-    .join("");
+  const furnaceRows = state.currentKnownFurnaceSize
+    ? `<li><strong>${state.currentKnownFurnaceSize}</strong> (customer provided current furnace size)</li>`
+    : (recommendedFurnaceOnly || [])
+        .map((item) => `<li><strong>${item.output}</strong> · Typical home: ${item.homeMin}–${item.homeMax} sq ft</li>`)
+        .join("");
 
   const furnaceSection = isFurnaceOnlySelection()
     ? `
@@ -636,11 +721,40 @@ function buildSizingMarkup() {
       return "";
     }
 
-    if (isFurnaceBasedSelection() && recommendedFurnaceOutput) {
-      return `
+    if (isFurnaceBasedSelection()) {
+      if (state.currentKnownFurnaceSize) {
+        return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${state.currentKnownFurnaceSize} ${selectedLabel}</button>
+      </div>
+    `;
+      }
+
+      if (recommendedFurnaceOutput) {
+        return `
       <div class="option-row sizing-actions">
         <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${recommendedFurnaceOutput.output} ${selectedLabel}</button>
         ${nextFurnaceOutput ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${nextFurnaceOutput.output} ${selectedLabel}</button>` : ""}
+      </div>
+    `;
+      }
+    }
+
+    if (isSplitACAndFurnaceSelection()) {
+      const coolingSizeLabel = state.currentKnownCoolingSize || (recommended ? recommended.ton : null);
+      const furnaceSizeLabel = state.currentKnownFurnaceSize || (recommendedFurnaceOutput ? recommendedFurnaceOutput.output : null);
+      return `
+      <div class="option-row sizing-actions">
+        ${coolingSizeLabel ? `<button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${coolingSizeLabel} A/C Systems</button>` : ""}
+        ${furnaceSizeLabel ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${furnaceSizeLabel} Furnace Systems</button>` : ""}
+      </div>
+    `;
+    }
+
+    if (state.currentKnownCoolingSize) {
+      return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${state.currentKnownCoolingSize} ${selectedLabel}</button>
       </div>
     `;
     }
@@ -660,7 +774,7 @@ function buildSizingMarkup() {
   return `
     <section class="sizing-panel">
       <h3 class="sizing-title">Estimated System Size Range</h3>
-      <p class="panel-subtitle">Based on ${state.homeSquareFeet} sq ft and typical local residential assumptions (average insulation, 8–9 ft ceilings).</p>
+      <p class="panel-subtitle">${state.homeSquareFeet ? `Based on ${state.homeSquareFeet} sq ft and typical local residential assumptions (average insulation, 8–9 ft ceilings).` : "Based on system size information you provided."}</p>
       <ul class="sizing-list">${systemRows}</ul>
       ${viewButtonsMarkup}
       ${furnaceSection}
@@ -686,8 +800,12 @@ function renderFinalStep() {
     summary.push(`Home size: ${state.homeSquareFeet} sq ft.`);
   }
 
-  if (state.currentKnownSystemSize) {
-    summary.push(`Known current system size: ${state.currentKnownSystemSize}.`);
+  if (state.currentKnownCoolingSize) {
+    summary.push(`Known current A/C size: ${state.currentKnownCoolingSize}.`);
+  }
+
+  if (state.currentKnownFurnaceSize) {
+    summary.push(`Known current furnace size: ${state.currentKnownFurnaceSize}.`);
   }
 
   if (state.gasEfficiency === "standard") {
