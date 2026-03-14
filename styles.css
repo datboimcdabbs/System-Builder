@@ -242,3 +242,32 @@ textarea {
 .sizing-actions {
   margin-bottom: 1rem;
 }
+
+
+.know-size-block {
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  border-radius: 12px;
+  background: rgba(8, 20, 38, 0.5);
+  padding: 0.8rem;
+}
+
+.know-size-title {
+  margin: 0 0 0.6rem;
+  color: #dbeafe;
+  font-weight: 600;
+}
+
+.glowing-btn {
+  box-shadow: 0 0 0 rgba(94, 165, 255, 0.55), 0 10px 28px rgba(43, 148, 235, 0.45);
+  border: 1px solid rgba(125, 211, 252, 0.35);
+}
+
+.glowing-btn:hover {
+  box-shadow: 0 0 18px rgba(94, 165, 255, 0.65), 0 12px 32px rgba(43, 148, 235, 0.5);
+}
+
+.selected-size-btn {
+  box-shadow: 0 0 20px rgba(49, 240, 199, 0.65), 0 12px 32px rgba(43, 148, 235, 0.5);
+  border-color: rgba(49, 240, 199, 0.8);
+}
+

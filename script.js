@@ -109,6 +109,7 @@ const state = {
   conversionPageTitle: null,
   gasEfficiency: null,
   homeSquareFeet: null,
+  currentKnownSystemSize: null,
 };
 
 function clearWizard() {
@@ -188,6 +189,7 @@ function resetDuctedPathState() {
   state.conversionPageTitle = null;
   state.gasEfficiency = null;
   state.homeSquareFeet = null;
+  state.currentKnownSystemSize = null;
 }
 
 function renderStart() {
@@ -282,10 +284,11 @@ function renderDesiredDuctedSystem() {
       onClick: () => {
         state.desiredSystem = option;
         state.homeSquareFeet = null;
+  state.currentKnownSystemSize = null;
 
         if (isDirectReplacement(option)) {
           state.conversionPageTitle = null;
-          renderDuctedSelectionPage();
+          continueToSizingFlow();
           return;
         }
 
@@ -360,7 +363,7 @@ function renderGasEfficiencyQuestion() {
       if (state.conversionPageTitle) {
         renderSystemConversionPage();
       } else {
-        renderDuctedSelectionPage();
+        renderDesiredDuctedSystem();
       }
     },
     cardClass: "thumbnail-grid--xl",
@@ -396,16 +399,63 @@ function renderHomeSizeQuestion() {
         Home Size (Square Feet)
         <input required name="squareFeet" type="number" min="300" step="1" placeholder="e.g., 2200" />
       </label>
-      <button class="primary-btn" type="submit">Continue</button>
+      <div class="know-size-block">
+        <p class="know-size-title">Do you know your current system size?</p>
+        <div class="option-row">
+          <button class="primary-btn glowing-btn" type="button" data-role="know-size-yes">Yes</button>
+          <button class="secondary-btn glowing-btn" type="button" data-role="know-size-no">No</button>
+        </div>
+        <div class="option-row know-size-options" data-role="size-options" hidden>
+          <button class="primary-btn glowing-btn" type="button" data-size="1.5 ton">1.5 Ton</button>
+          <button class="primary-btn glowing-btn" type="button" data-size="2 ton">2 Ton</button>
+          <button class="primary-btn glowing-btn" type="button" data-size="2.5 ton">2.5 Ton</button>
+          <button class="primary-btn glowing-btn" type="button" data-size="3 ton">3 Ton</button>
+          <button class="primary-btn glowing-btn" type="button" data-size="3.5 ton">3.5 Ton</button>
+          <button class="primary-btn glowing-btn" type="button" data-size="4 ton">4 Ton</button>
+          <button class="primary-btn glowing-btn" type="button" data-size="5 ton">5 Ton</button>
+        </div>
+      </div>
+      <button class="primary-btn glowing-btn" type="submit">Continue</button>
     </form>
     <button class="secondary-btn" type="button" data-role="back-button">Back</button>
   `;
 
   const form = wizard.querySelector('[data-role="size-form"]');
   const input = form.querySelector('input[name="squareFeet"]');
+  const knowYesBtn = wizard.querySelector('[data-role="know-size-yes"]');
+  const knowNoBtn = wizard.querySelector('[data-role="know-size-no"]');
+  const sizeOptions = wizard.querySelector('[data-role="size-options"]');
+
   if (state.homeSquareFeet) {
     input.value = state.homeSquareFeet;
   }
+
+  if (state.currentKnownSystemSize) {
+    sizeOptions.hidden = false;
+  }
+
+  knowYesBtn.addEventListener("click", () => {
+    sizeOptions.hidden = false;
+  });
+
+  knowNoBtn.addEventListener("click", () => {
+    sizeOptions.hidden = true;
+    state.currentKnownSystemSize = null;
+  });
+
+  sizeOptions.querySelectorAll('button[data-size]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.currentKnownSystemSize = btn.getAttribute('data-size');
+      sizeOptions.querySelectorAll('button[data-size]').forEach((otherBtn) => {
+        otherBtn.classList.remove('selected-size-btn');
+      });
+      btn.classList.add('selected-size-btn');
+    });
+
+    if (state.currentKnownSystemSize === btn.getAttribute('data-size')) {
+      btn.classList.add('selected-size-btn');
+    }
+  });
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -424,7 +474,7 @@ function renderHomeSizeQuestion() {
       return;
     }
 
-    renderDuctedSelectionPage();
+    renderDesiredDuctedSystem();
   });
 }
 
@@ -557,8 +607,8 @@ function buildSizingMarkup() {
     state.desiredSystem && recommended
       ? `
       <div class="option-row sizing-actions">
-        <button class="primary-btn" type="button" data-role="view-recommended-size">View ${recommended.ton} ${selectedLabel}</button>
-        ${next ? `<button class="secondary-btn" type="button" data-role="view-next-size">View ${next.ton} ${selectedLabel}</button>` : ""}
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${recommended.ton} ${selectedLabel}</button>
+        ${next ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${next.ton} ${selectedLabel}</button>` : ""}
       </div>
     `
       : "";
@@ -570,7 +620,6 @@ function buildSizingMarkup() {
       <ul class="sizing-list">${systemRows}</ul>
       ${viewButtonsMarkup}
       ${furnaceSection}
-      <p class="panel-subtitle"><strong>Important Disclaimer:</strong> Estimated system size only. Actual HVAC sizing depends on insulation levels, window area, home orientation, ceiling height, duct design, infiltration, local climate, and a Manual J load calculation. A contractor should verify sizing before installation.</p>
       <p class="panel-subtitle"><strong>Sizing & Pricing Disclaimer:</strong> The system sizes and pricing shown here are based on the square footage information you provided and typical sizing guidelines for homes in our area. Once you’ve selected the system you’d like, you can schedule your free verification and sizing appointment online with The Heating and Cooling Guys. During this visit, we’ll confirm the equipment selection and installation details. As long as no additional issues or installation requirements are discovered, the pricing shown here will remain accurate. If any adjustments are needed, we’ll review them with you before moving forward.</p>
     </section>
   `;
@@ -591,6 +640,10 @@ function renderFinalStep() {
 
   if (state.homeSquareFeet) {
     summary.push(`Home size: ${state.homeSquareFeet} sq ft.`);
+  }
+
+  if (state.currentKnownSystemSize) {
+    summary.push(`Known current system size: ${state.currentKnownSystemSize}.`);
   }
 
   if (state.gasEfficiency === "standard") {
