@@ -216,3 +216,26 @@ textarea {
   color: var(--accent-strong);
   font-weight: 600;
 }
+
+
+.sizing-panel {
+  margin-top: 1rem;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  border-radius: 14px;
+  background: rgba(10, 21, 40, 0.55);
+  padding: 1rem;
+}
+
+.sizing-title {
+  margin: 0 0 0.5rem;
+  color: #dbeafe;
+}
+
+.sizing-list {
+  margin: 0 0 1rem 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  color: #d1e6ff;
+}
+

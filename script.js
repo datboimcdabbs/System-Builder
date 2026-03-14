@@ -81,6 +81,25 @@ const fuelLabel = {
   electric: "Electric",
 };
 
+
+const systemSizeReference = [
+  { ton: "1.5 ton", coolingBTU: "18,000 BTU", homeMin: 600, homeMax: 900, furnaceRange: "30k – 45k BTU" },
+  { ton: "2 ton", coolingBTU: "24,000 BTU", homeMin: 900, homeMax: 1200, furnaceRange: "40k – 60k BTU" },
+  { ton: "2.5 ton", coolingBTU: "30,000 BTU", homeMin: 1200, homeMax: 1500, furnaceRange: "50k – 70k BTU" },
+  { ton: "3 ton", coolingBTU: "36,000 BTU", homeMin: 1500, homeMax: 1800, furnaceRange: "60k – 80k BTU" },
+  { ton: "3.5 ton", coolingBTU: "42,000 BTU", homeMin: 1800, homeMax: 2100, furnaceRange: "70k – 90k BTU" },
+  { ton: "4 ton", coolingBTU: "48,000 BTU", homeMin: 2100, homeMax: 2400, furnaceRange: "80k – 100k BTU" },
+  { ton: "5 ton", coolingBTU: "60,000 BTU", homeMin: 2400, homeMax: 3000, furnaceRange: "100k – 120k BTU" },
+];
+
+const furnaceOnlyReference = [
+  { output: "40,000 BTU", homeMin: 800, homeMax: 1000 },
+  { output: "60,000 BTU", homeMin: 1200, homeMax: 1500 },
+  { output: "80,000 BTU", homeMin: 1600, homeMax: 2000 },
+  { output: "100,000 BTU", homeMin: 2000, homeMax: 2500 },
+  { output: "120,000 BTU", homeMin: 2500, homeMax: 3000 },
+];
+
 const state = {
   hasDuctwork: null,
   currentSystem: null,
@@ -409,6 +428,92 @@ function renderHomeSizeQuestion() {
   });
 }
 
+
+function getRecommendedSystemRange(squareFeet) {
+  if (!squareFeet) {
+    return null;
+  }
+
+  const numericSqFt = Number(squareFeet);
+  const overlaps = systemSizeReference.filter((item) => numericSqFt >= item.homeMin && numericSqFt <= item.homeMax);
+
+  if (overlaps.length > 0) {
+    return overlaps;
+  }
+
+  if (numericSqFt < systemSizeReference[0].homeMin) {
+    return [systemSizeReference[0]];
+  }
+
+  return [systemSizeReference[systemSizeReference.length - 1]];
+}
+
+function getRecommendedFurnaceOnlyRange(squareFeet) {
+  if (!squareFeet) {
+    return null;
+  }
+
+  const numericSqFt = Number(squareFeet);
+  const overlaps = furnaceOnlyReference.filter((item) => numericSqFt >= item.homeMin && numericSqFt <= item.homeMax);
+
+  if (overlaps.length > 0) {
+    return overlaps;
+  }
+
+  if (numericSqFt < furnaceOnlyReference[0].homeMin) {
+    return [furnaceOnlyReference[0]];
+  }
+
+  return [furnaceOnlyReference[furnaceOnlyReference.length - 1]];
+}
+
+function isFurnaceOnlySelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return state.desiredSystem.label.startsWith("Gas Furnace Only") || state.desiredSystem.label.startsWith("Oil Furnace Only");
+}
+
+function buildSizingMarkup() {
+  const recommendedSystems = getRecommendedSystemRange(state.homeSquareFeet);
+  const recommendedFurnaceOnly = getRecommendedFurnaceOnlyRange(state.homeSquareFeet);
+
+  if (!recommendedSystems) {
+    return "";
+  }
+
+  const systemRows = recommendedSystems
+    .map(
+      (item) => `
+        <li><strong>${item.ton}</strong> (${item.coolingBTU}) · Typical home: ${item.homeMin}–${item.homeMax} sq ft · Typical furnace range: ${item.furnaceRange}</li>
+      `,
+    )
+    .join("");
+
+  const furnaceRows = (recommendedFurnaceOnly || [])
+    .map((item) => `<li><strong>${item.output}</strong> · Typical home: ${item.homeMin}–${item.homeMax} sq ft</li>`)
+    .join("");
+
+  const furnaceSection = isFurnaceOnlySelection()
+    ? `
+      <h3 class="sizing-title">Furnace-Only Heating Reference</h3>
+      <ul class="sizing-list">${furnaceRows}</ul>
+    `
+    : "";
+
+  return `
+    <section class="sizing-panel">
+      <h3 class="sizing-title">Estimated System Size Range</h3>
+      <p class="panel-subtitle">Based on ${state.homeSquareFeet} sq ft and typical local residential assumptions (average insulation, 8–9 ft ceilings).</p>
+      <ul class="sizing-list">${systemRows}</ul>
+      ${furnaceSection}
+      <p class="panel-subtitle"><strong>Important Disclaimer:</strong> Estimated system size only. Actual HVAC sizing depends on insulation levels, window area, home orientation, ceiling height, duct design, infiltration, local climate, and a Manual J load calculation. A contractor should verify sizing before installation.</p>
+      <p class="panel-subtitle"><strong>Sizing & Pricing Disclaimer:</strong> The system sizes and pricing shown here are based on the square footage information you provided and typical sizing guidelines for homes in our area. Once you’ve selected the system you’d like, you can schedule your free verification and sizing appointment online with The Heating and Cooling Guys. During this visit, we’ll confirm the equipment selection and installation details. As long as no additional issues or installation requirements are discovered, the pricing shown here will remain accurate. If any adjustments are needed, we’ll review them with you before moving forward.</p>
+    </section>
+  `;
+}
+
 function renderFinalStep() {
   clearWizard();
   const template = document.getElementById("final-template").content.cloneNode(true);
@@ -442,6 +547,11 @@ function renderFinalStep() {
   template.querySelector('[data-role="contact-button"]').addEventListener("click", renderContactPage);
   template.querySelector('[data-role="restart-button"]').addEventListener("click", renderStart);
   wizard.appendChild(template);
+
+  const sizingMarkup = buildSizingMarkup();
+  if (sizingMarkup) {
+    wizard.insertAdjacentHTML("beforeend", sizingMarkup);
+  }
 }
 
 function renderContactPage() {
