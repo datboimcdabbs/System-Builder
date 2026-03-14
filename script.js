@@ -1,8 +1,8 @@
 const wizard = document.getElementById("wizard");
 
 const ductworkPresenceOptions = [
-  { label: "Yes", image: "assets/ductwork-yes.svg", value: true },
-  { label: "No", image: "assets/ductwork-no.svg", value: false },
+  { label: "Yes", image: "https://www.novakheating.com/wp-content/webp-express/webp-images/uploads/2022/09/Novak_Ducts-vs.-Vents-1.png.webp", value: true },
+  { label: "No", image: "https://fredelectric.com/wp-content/uploads/2026/01/Baseboard-Heaters-to-Heat-Pump-Blog-1024x576.png", value: false },
 ];
 
 const systemsWithDuctwork = [
