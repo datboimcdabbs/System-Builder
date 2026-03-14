@@ -6,12 +6,12 @@ const ductworkPresenceOptions = [
 ];
 
 const systemsWithDuctwork = [
-  { label: "Heat Pump System", image: "assets/heat-pump.svg" },
-  { label: "A/C and Gas Furnace", image: "assets/ac-gas-furnace.svg" },
-  { label: "A/C and Oil Furnace", image: "assets/ac-oil-furnace.svg" },
-  { label: "A/C and Fan Coil", image: "assets/ac-fan-coil.svg" },
-  { label: "Oil Furnace Only", image: "assets/oil-furnace-only.svg" },
-  { label: "Gas Furnace Only", image: "assets/gas-furnace-only.svg" },
+  { label: "Heat Pump System", image: "assets/heat-pump.svg", fuelType: "electric" },
+  { label: "A/C and Gas Furnace", image: "assets/ac-gas-furnace.svg", fuelType: "gas" },
+  { label: "A/C and Oil Furnace", image: "assets/ac-oil-furnace.svg", fuelType: "oil" },
+  { label: "A/C and Fan Coil", image: "assets/ac-fan-coil.svg", fuelType: "electric" },
+  { label: "Oil Furnace Only", image: "assets/oil-furnace-only.svg", fuelType: "oil" },
+  { label: "Gas Furnace Only", image: "assets/gas-furnace-only.svg", fuelType: "gas" },
 ];
 
 const systemsWithoutDuctwork = [
@@ -47,9 +47,25 @@ const desiredDuctedSystems = systemsWithDuctwork.map((item) => ({
   label: `${item.label} (Using Your Existing Ductwork)`,
 }));
 
+const conversionOptions = [
+  { id: "oil-to-gas", title: "Oil to Gas Conversion", from: "oil", to: "gas" },
+  { id: "gas-to-oil", title: "Gas to Oil Conversion", from: "gas", to: "oil" },
+  { id: "gas-to-electric", title: "Gas to Electric Conversion", from: "gas", to: "electric" },
+  { id: "electric-to-gas", title: "Electric to Gas Conversion", from: "electric", to: "gas" },
+  { id: "oil-to-electric", title: "Oil to Electric Conversion", from: "oil", to: "electric" },
+  { id: "electric-to-oil", title: "Electric to Oil Conversion", from: "electric", to: "oil" },
+];
+
+const fuelLabel = {
+  gas: "Gas",
+  oil: "Oil",
+  electric: "Electric",
+};
+
 const state = {
   hasDuctwork: null,
   currentSystem: null,
+  currentFuelType: null,
 };
 
 function clearWizard() {
@@ -85,7 +101,10 @@ function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMa
   template.querySelector(".panel-title").textContent = title;
   template.querySelector(".panel-subtitle").textContent = subtitle || "";
   const grid = template.querySelector('[data-role="thumbnail-options"]');
-  if (cardClass) grid.classList.add(cardClass);
+
+  if (cardClass) {
+    grid.classList.add(cardClass);
+  }
 
   options.forEach((option) => {
     const card = createThumbnailCard(option, highlightMatcher);
@@ -124,6 +143,8 @@ function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMa
 function renderStart() {
   state.hasDuctwork = null;
   state.currentSystem = null;
+  state.currentFuelType = null;
+
   renderThumbnailQuestion({
     title: "Does your Heating/Cooling system use Ductwork and registers to keep your air comfortable?",
     subtitle: "Choose the option that best matches your home.",
@@ -147,10 +168,13 @@ function renderCurrentSystemQuestion() {
       ...option,
       onClick: () => {
         state.currentSystem = option.label;
+        state.currentFuelType = option.fuelType || null;
+
         if (state.hasDuctwork) {
           renderDuctCondition();
           return;
         }
+
         renderContactPage();
       },
     })),
@@ -178,10 +202,70 @@ function renderDesiredDuctedSystem() {
     subtitle: "All ducted replacement systems qualify for 10 Years of Free Maintenance!",
     options: desiredDuctedSystems.map((option) => ({
       ...option,
-      onClick: () => renderFinalStep(option.label),
+      onClick: () => {
+        const isFuelConversion = state.currentFuelType && option.fuelType !== state.currentFuelType;
+        if (isFuelConversion) {
+          renderConversionOptions(option);
+          return;
+        }
+        renderFinalStep(option.label);
+      },
     })),
     onBack: renderDuctCondition,
     highlightMatcher: (option) => option.label.startsWith(state.currentSystem),
+  });
+}
+
+function renderConversionOptions(targetSystem) {
+  const recommended = conversionOptions.find(
+    (option) => option.from === state.currentFuelType && option.to === targetSystem.fuelType,
+  );
+
+  const orderedOptions = [
+    ...(recommended ? [recommended] : []),
+    ...conversionOptions.filter((option) => option !== recommended),
+  ];
+
+  renderThumbnailQuestion({
+    title: "System Conversion Path",
+    subtitle: `You currently have a ${fuelLabel[state.currentFuelType]} system and selected a ${fuelLabel[targetSystem.fuelType]} replacement. Choose the conversion path to review details.`,
+    options: orderedOptions.map((option) => ({
+      label: option.title,
+      image: "assets/no-system.svg",
+      onClick: () => renderConversionStandIn(option, targetSystem.label),
+    })),
+    onBack: renderDesiredDuctedSystem,
+    highlightMatcher: (option) => recommended && option.label === recommended.title,
+  });
+}
+
+function renderConversionStandIn(conversionOption, targetSystemLabel) {
+  clearWizard();
+  wizard.innerHTML = `
+    <h2 class="panel-title">${conversionOption.title}</h2>
+    <p class="panel-subtitle">
+      Stand-in page: this path covers converting from ${fuelLabel[conversionOption.from]} to
+      ${fuelLabel[conversionOption.to]} while planning for your selected system:<br />
+      <strong>${targetSystemLabel}</strong>.
+    </p>
+    <p class="panel-subtitle">
+      We’ll evaluate equipment sizing, venting/electrical/fuel line requirements, and rebate opportunities
+      during your free Pre-Install Verification appointment.
+    </p>
+    <div class="option-row">
+      <button class="primary-btn" type="button" data-role="to-contact">Continue to Contact Us</button>
+      <button class="secondary-btn" type="button" data-role="to-conversions">Back to Conversion Options</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="to-contact"]').addEventListener("click", renderContactPage);
+  wizard.querySelector('[data-role="to-conversions"]').addEventListener("click", () => {
+    const selectedTarget = desiredDuctedSystems.find((item) => item.label === targetSystemLabel);
+    if (selectedTarget) {
+      renderConversionOptions(selectedTarget);
+    } else {
+      renderDesiredDuctedSystem();
+    }
   });
 }
 

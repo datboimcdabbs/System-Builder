@@ -106,6 +106,14 @@ textarea {
   transform: translateY(-2px);
 }
 
+
+.option-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 .thumbnail-grid {
   display: grid;
   gap: 0.9rem;
