@@ -467,6 +467,15 @@ function getRecommendedFurnaceOnlyRange(squareFeet) {
   return [furnaceOnlyReference[furnaceOnlyReference.length - 1]];
 }
 
+
+function isHeatPumpSelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return state.desiredSystem.targetType === "Heat Pump";
+}
+
 function isFurnaceOnlySelection() {
   if (!state.desiredSystem) {
     return false;
@@ -526,11 +535,11 @@ function buildSizingMarkup() {
   }
 
   const systemRows = recommendedSystems
-    .map(
-      (item) => `
-        <li><strong>${item.ton}</strong> (${item.coolingBTU}) · Typical home: ${item.homeMin}–${item.homeMax} sq ft · Typical furnace range: ${item.furnaceRange}</li>
-      `,
-    )
+    .map((item) => {
+      const baseLine = `<strong>${item.ton}</strong> (${item.coolingBTU}) · Typical home: ${item.homeMin}–${item.homeMax} sq ft`;
+      const includeFurnaceRange = !isHeatPumpSelection();
+      return `<li>${baseLine}${includeFurnaceRange ? ` · Typical furnace range: ${item.furnaceRange}` : ""}</li>`;
+    })
     .join("");
 
   const furnaceRows = (recommendedFurnaceOnly || [])
