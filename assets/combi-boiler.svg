@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" fill="none">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="640" y2="360" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0C2643"/>
+<stop offset="1" stop-color="#1D5B8C"/>
+</linearGradient>
+</defs>
+<rect width="640" height="360" rx="24" fill="url(#g)"/>
+<rect x="95" y="70" width="450" height="220" rx="24" fill="#0A1528" stroke="#87D7FF" stroke-width="4"/>
+<rect x="130" y="105" width="160" height="150" rx="16" fill="#1D3E63"/>
+<rect x="320" y="105" width="190" height="24" rx="12" fill="#2E6A9B"/>
+<rect x="320" y="145" width="150" height="18" rx="9" fill="#2E6A9B"/>
+<rect x="320" y="177" width="120" height="18" rx="9" fill="#2E6A9B"/>
+<text x="320" y="255" fill="#8EE6FF" font-size="34" font-family="Segoe UI,Arial,sans-serif" font-weight="700">Combi / Tankless</text>
+</svg>

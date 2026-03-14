@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HVAC Replacement Finder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="hero-eyebrow">New Install Matching Tool</p>
+        <h1>Find the Right HVAC Replacement in Minutes</h1>
+        <p>
+          Answer a few quick questions and we’ll guide you to the best-fit replacement path for your
+          current home comfort system.
+        </p>
+      </header>
+
+      <section id="wizard" class="wizard-panel"></section>
+    </main>
+
+    <template id="binary-question-template">
+      <h2 class="panel-title"></h2>
+      <p class="panel-subtitle"></p>
+      <div class="option-row" data-role="binary-options"></div>
+    </template>
+
+    <template id="thumbnail-question-template">
+      <h2 class="panel-title"></h2>
+      <p class="panel-subtitle"></p>
+      <div class="thumbnail-grid" data-role="thumbnail-options"></div>
+      <button class="secondary-btn" data-role="back-button" type="button">Back</button>
+    </template>
+
+    <template id="duct-check-template">
+      <h2 class="panel-title">Is your ductwork and registers in usable condition?</h2>
+      <p class="panel-subtitle offer-note">
+        All ducted replacement systems qualify for 10 Years of Free Maintenance!
+      </p>
+      <p class="panel-subtitle">
+        We’ve seen it all—some ductwork systems have more holes than my dad’s socks, and some have
+        become a home for a family of raccoons (you would probably know if this applies to you). We
+        have even conducted a cat rescue mission in a customer's ductwork (the cat was upset at us
+        when we pulled her out, but otherwise she’s happy and healthy to this day!).
+      </p>
+
+      <div class="stacked-options" data-role="duct-options"></div>
+
+      <button class="secondary-btn" data-role="back-button" type="button">Back</button>
+    </template>
+
+    <template id="contact-template">
+      <h2 class="panel-title">Let’s Build Your Ideal Installation Plan</h2>
+      <p class="panel-subtitle">
+        A comfort specialist can help with system design, ductwork updates, and full replacements.
+      </p>
+      <form class="contact-form" data-role="contact-form">
+        <label>
+          Full Name
+          <input required name="name" type="text" placeholder="Jane Homeowner" />
+        </label>
+        <label>
+          Email
+          <input required name="email" type="email" placeholder="jane@example.com" />
+        </label>
+        <label>
+          Phone
+          <input required name="phone" type="tel" placeholder="(555) 123-4567" />
+        </label>
+        <label>
+          Notes
+          <textarea name="notes" rows="4" placeholder="Tell us about your project"></textarea>
+        </label>
+        <button class="primary-btn" type="submit">Request My Free Consultation</button>
+      </form>
+      <button class="secondary-btn" data-role="restart-button" type="button">Start Over</button>
+    </template>
+
+    <template id="final-template">
+      <h2 class="panel-title">Great Choice! You’re Almost Done</h2>
+      <p class="panel-subtitle" data-role="summary"></p>
+      <p class="panel-subtitle">
+        Next step: schedule your free pre-install verification and quote.
+      </p>
+      <button class="primary-btn" data-role="contact-button" type="button">Continue to Contact Us</button>
+      <button class="secondary-btn" data-role="restart-button" type="button">Start Over</button>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>

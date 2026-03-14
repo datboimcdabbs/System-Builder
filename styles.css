@@ -1,0 +1,218 @@
+:root {
+  --bg: #081225;
+  --card: rgba(10, 25, 45, 0.88);
+  --card-border: rgba(125, 196, 255, 0.3);
+  --text: #eaf4ff;
+  --muted: #b2c9dd;
+  --accent: #43c5ff;
+  --accent-strong: #31f0c7;
+  --danger: #ff9ca7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top right, #1a4e8f 0%, transparent 35%),
+    radial-gradient(circle at bottom left, #0f8b7f 0%, transparent 30%), var(--bg);
+}
+
+.app-shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+.hero {
+  background: linear-gradient(140deg, rgba(20, 46, 82, 0.88), rgba(13, 31, 54, 0.92));
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+}
+
+.hero-eyebrow {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+}
+
+.hero p {
+  margin: 0.9rem 0 0;
+  color: var(--muted);
+}
+
+.wizard-panel {
+  margin-top: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+}
+
+.panel-title {
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+}
+
+.panel-subtitle {
+  margin: 0 0 1.2rem;
+  color: var(--muted);
+}
+
+.offer-note {
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.option-row {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.primary-btn,
+.secondary-btn,
+.choice-btn,
+.duct-option-btn {
+  border: 0;
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.primary-btn,
+.choice-btn,
+.duct-option-btn {
+  background: linear-gradient(135deg, #3cc4ff, #5e95ff);
+  color: #00142b;
+  font-weight: 700;
+  box-shadow: 0 10px 28px rgba(43, 148, 235, 0.45);
+}
+
+.secondary-btn {
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid rgba(170, 206, 235, 0.35);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.choice-btn:hover,
+.duct-option-btn:hover {
+  transform: translateY(-2px);
+}
+
+.thumbnail-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 1rem;
+}
+
+.thumbnail-card {
+  position: relative;
+  border: 1px solid rgba(178, 211, 238, 0.22);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(11, 35, 60, 0.88);
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.thumbnail-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnail-card span {
+  display: block;
+  padding: 0.8rem;
+  font-weight: 600;
+}
+
+.direct-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #32f0c6, #9dffe1);
+  color: #032d26;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.stacked-options {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.duct-option {
+  border: 1px solid rgba(178, 211, 238, 0.24);
+  background: rgba(13, 38, 66, 0.86);
+  border-radius: 14px;
+  padding: 0.85rem;
+}
+
+.duct-option p {
+  margin: 0;
+}
+
+.expand-copy {
+  margin-top: 0.7rem;
+  border-top: 1px dashed rgba(177, 205, 227, 0.25);
+  padding-top: 0.75rem;
+}
+
+.contact-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.contact-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  border: 1px solid rgba(167, 205, 235, 0.4);
+  border-radius: 12px;
+  background: rgba(4, 13, 28, 0.7);
+  color: var(--text);
+  padding: 0.7rem;
+}
+
+.form-message {
+  margin-top: 1rem;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
