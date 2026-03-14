@@ -588,7 +588,17 @@ function getRecommendedFurnaceOnlyRange(squareFeet) {
   const overlaps = furnaceOnlyReference.filter((item) => numericSqFt >= item.homeMin && numericSqFt <= item.homeMax);
 
   if (overlaps.length > 0) {
-    return overlaps;
+    const ordered = [...overlaps];
+    const first = ordered[0];
+    const firstIndex = furnaceOnlyReference.findIndex((item) => item.output === first.output);
+
+    // If square footage sits exactly on the lower boundary of a bracket,
+    // include the previous bracket as a valid neighboring option.
+    if (firstIndex > 0 && numericSqFt === first.homeMin) {
+      ordered.unshift(furnaceOnlyReference[firstIndex - 1]);
+    }
+
+    return ordered;
   }
 
   if (numericSqFt < furnaceOnlyReference[0].homeMin) {
@@ -741,14 +751,45 @@ function buildSizingMarkup() {
     }
 
     if (isSplitACAndFurnaceSelection()) {
-      const coolingSizeLabel = state.currentKnownCoolingSize || (recommended ? recommended.ton : null);
-      const furnaceSizeLabel = state.currentKnownFurnaceSize || (recommendedFurnaceOutput ? recommendedFurnaceOutput.output : null);
-      return `
+      if (state.currentKnownCoolingSize && state.currentKnownFurnaceSize) {
+        return `
       <div class="option-row sizing-actions">
-        ${coolingSizeLabel ? `<button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${coolingSizeLabel} A/C Systems</button>` : ""}
-        ${furnaceSizeLabel ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${furnaceSizeLabel} Furnace Systems</button>` : ""}
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${state.currentKnownCoolingSize} A/C + ${state.currentKnownFurnaceSize} Furnace</button>
       </div>
     `;
+      }
+
+      const coolingCandidates = state.currentKnownCoolingSize
+        ? [state.currentKnownCoolingSize]
+        : recommendedSystems.map((item) => item.ton);
+      const furnaceCandidates = state.currentKnownFurnaceSize
+        ? [state.currentKnownFurnaceSize]
+        : recommendedFurnaceOnly.map((item) => item.output);
+
+      const comboCount = Math.max(coolingCandidates.length, furnaceCandidates.length);
+      const combos = [];
+      for (let index = 0; index < comboCount; index += 1) {
+        const cooling = coolingCandidates[index] || coolingCandidates[coolingCandidates.length - 1];
+        const furnace = furnaceCandidates[index] || furnaceCandidates[furnaceCandidates.length - 1];
+        if (cooling && furnace) {
+          combos.push(`${cooling} A/C + ${furnace} Furnace`);
+        }
+      }
+
+      if (combos.length > 0) {
+        return `
+      <div class="option-row sizing-actions">
+        ${combos
+          .map(
+            (label, index) =>
+              `<button type="button" class="${index === 0 ? "primary-btn" : "secondary-btn"} glowing-btn" data-role="${index === 0 ? "view-recommended-size" : "view-next-size"}">View ${label}</button>`,
+          )
+          .join("")}
+      </div>
+    `;
+      }
+
+      return "";
     }
 
     if (state.currentKnownCoolingSize) {
