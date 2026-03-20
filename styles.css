@@ -40,8 +40,7 @@ input {
 .intro-card,
 .builder-card,
 .secondary-paths,
-.detail-panel,
-.option-group {
+.detail-panel {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -49,8 +48,7 @@ input {
 }
 
 .intro-card,
-.builder-card,
-.secondary-paths {
+.builder-card {
   padding: 22px 24px;
   margin-bottom: 20px;
 }
@@ -70,19 +68,17 @@ input {
 .builder-header,
 .secondary-header,
 .section-label-row,
-.option-group-header,
 .metric-title-row,
 .detail-hero,
 .equipment-grid,
-.controls-grid {
+.controls-grid,
+.actions {
   display: flex;
   gap: 16px;
 }
 
-.intro-header,
-.secondary-header,
+.builder-header,
 .section-label-row,
-.option-group-header,
 .metric-title-row,
 .detail-hero {
   justify-content: space-between;
@@ -165,11 +161,22 @@ label {
   color: var(--text);
 }
 
-.primary-path {
-  border: 1px solid var(--line-strong);
+.recommendation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.9fr);
+  gap: 18px;
+}
+
+.primary-path,
+.secondary-paths {
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px;
   background: var(--surface);
+}
+
+.primary-path {
+  border-color: var(--line-strong);
 }
 
 .primary-path.emphasis {
@@ -177,14 +184,20 @@ label {
 }
 
 .ghost-button,
-.accordion-action,
+.primary-button,
+.secondary-button,
 .warranty-action,
-.collapse-trigger {
+.text-button {
   border-radius: 8px;
+  cursor: pointer;
+}
+
+.ghost-button,
+.secondary-button,
+.text-button {
   border: 1px solid var(--line);
   background: #fff;
   color: #15407a;
-  cursor: pointer;
 }
 
 .ghost-button {
@@ -192,16 +205,11 @@ label {
   font-weight: 700;
 }
 
-.ghost-button.compact {
-  padding: 7px 12px;
-  font-size: 0.9rem;
-}
-
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  margin: 18px 0 10px;
+  margin: 18px 0 14px;
 }
 
 .metric-card {
@@ -211,16 +219,17 @@ label {
   background: #fff;
 }
 
-.metric-card h4 {
+.metric-card h4,
+.option-card h4 {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 0.95rem;
 }
 
 .metric-card strong {
   display: block;
   margin: 6px 0 8px;
   color: var(--blue);
-  font-size: 1.55rem;
+  font-size: 1.45rem;
 }
 
 .info-dot {
@@ -258,26 +267,51 @@ label {
   background: var(--rose);
 }
 
+.benefit-list {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.actions {
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.primary-button,
+.secondary-button,
+.warranty-action,
+.text-button {
+  padding: 11px 16px;
+  font-weight: 700;
+}
+
+.primary-button {
+  border: 1px solid #2f97ef;
+  background: #f2f9ff;
+  color: #1156a4;
+}
+
+.secondary-button {
+  background: #fff;
+}
+
 .stacked-actions {
   display: grid;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.accordion-action,
 .warranty-action {
-  padding: 11px 16px;
-  font-weight: 700;
-}
-
-.accordion-action {
-  color: #1b4d95;
-}
-
-.warranty-action {
-  border-color: #79e3a1;
+  border: 1px solid #79e3a1;
   background: #ecfff2;
   color: #146a3c;
+}
+
+.text-button {
+  width: 100%;
+  margin-top: 12px;
 }
 
 .detail-panel {
@@ -331,25 +365,23 @@ label {
   font-weight: 700;
 }
 
-.secondary-paths h3 {
-  margin-top: 4px;
+.secondary-paths {
+  align-self: start;
 }
 
-.alternate-groups {
+.secondary-paths h3 {
+  margin-top: 4px;
+  font-size: 1.4rem;
+}
+
+.compact-header {
+  display: block;
+}
+
+.alternate-options {
   display: grid;
   gap: 10px;
   margin-top: 16px;
-}
-
-.option-group {
-  padding: 12px;
-}
-
-.alternate-options.two-up {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 10px;
 }
 
 .option-card {
@@ -364,28 +396,11 @@ label {
   box-shadow: inset 0 0 0 1px rgba(28, 149, 239, 0.25);
 }
 
-.option-card h5 {
-  margin: 0 0 6px;
-  font-size: 1rem;
-}
-
 .price-note {
-  margin-bottom: 8px;
+  margin: 6px 0 8px;
   color: var(--green);
   font-weight: 700;
-}
-
-.collapsible-row {
-  padding: 0;
-}
-
-.collapse-trigger {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 16px;
-  font-weight: 700;
+  font-size: 0.92rem;
 }
 
 .secondary-state .status-pill {
@@ -394,29 +409,27 @@ label {
   color: #a45307;
 }
 
-.secondary-state .primary-path {
+.secondary-state .primary-path,
+.secondary-state .warranty-action {
   border-color: #f1bf8f;
 }
 
 .secondary-state .warranty-action {
-  border-color: #f1bf8f;
   background: #fff8f1;
   color: #9d5a16;
 }
 
 @media (max-width: 900px) {
-  .intro-header,
-  .secondary-header,
+  .builder-header,
   .section-label-row,
-  .option-group-header,
   .detail-hero,
   .equipment-grid,
   .controls-grid {
     flex-direction: column;
   }
 
-  .metric-grid,
-  .alternate-options.two-up {
+  .recommendation-layout,
+  .metric-grid {
     grid-template-columns: 1fr;
   }
 
