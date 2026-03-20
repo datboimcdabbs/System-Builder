@@ -1,0 +1,439 @@
+:root {
+  color-scheme: light;
+  --page: #f7f9fc;
+  --surface: #ffffff;
+  --surface-muted: #fbfcfe;
+  --text: #0f2340;
+  --muted: #5e7291;
+  --line: #ccd7e6;
+  --line-strong: #8dbdff;
+  --blue: #1c95ef;
+  --blue-soft: #edf6ff;
+  --green: #1e8e50;
+  --green-soft: #e8fff0;
+  --rose: #e7949d;
+  --shadow: 0 0 0 1px rgba(165, 184, 210, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--page);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.intro-card,
+.builder-card,
+.secondary-paths,
+.detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.intro-card,
+.builder-card {
+  padding: 22px 24px;
+  margin-bottom: 20px;
+}
+
+.eyebrow,
+.section-kicker,
+.card-label,
+.equipment-title {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #557098;
+}
+
+.intro-header,
+.builder-header,
+.secondary-header,
+.section-label-row,
+.metric-title-row,
+.detail-hero,
+.equipment-grid,
+.controls-grid,
+.actions {
+  display: flex;
+  gap: 16px;
+}
+
+.builder-header,
+.section-label-row,
+.metric-title-row,
+.detail-hero {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.intro-header h1,
+.builder-header h2,
+.primary-path h3,
+.secondary-paths h3,
+.detail-panel h4 {
+  margin: 6px 0 8px;
+  color: #0e2242;
+}
+
+.intro-header h1 {
+  font-size: clamp(1.8rem, 2.8vw, 2.5rem);
+}
+
+.builder-header h2,
+.primary-path h3,
+.secondary-paths h3 {
+  font-size: 1.9rem;
+}
+
+.hero-copy,
+.section-description,
+.secondary-header p,
+.detail-panel p,
+.metric-card p,
+.option-card p,
+.equipment-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #8fe0af;
+  border-radius: 10px;
+  background: var(--green-soft);
+  color: #12693a;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.builder-header {
+  margin-bottom: 18px;
+}
+
+.controls-grid {
+  margin-bottom: 20px;
+}
+
+.controls-grid fieldset {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-muted);
+}
+
+legend {
+  padding: 0 8px;
+  font-weight: 700;
+  color: #26415f;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--text);
+}
+
+.recommendation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.9fr);
+  gap: 18px;
+}
+
+.primary-path,
+.secondary-paths {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.primary-path {
+  border-color: var(--line-strong);
+}
+
+.primary-path.emphasis {
+  box-shadow: 0 0 0 2px rgba(28, 149, 239, 0.1);
+}
+
+.ghost-button,
+.primary-button,
+.secondary-button,
+.warranty-action,
+.text-button {
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ghost-button,
+.secondary-button,
+.text-button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #15407a;
+}
+
+.ghost-button {
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 14px;
+}
+
+.metric-card {
+  padding: 10px 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.metric-card h4,
+.option-card h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.metric-card strong {
+  display: block;
+  margin: 6px 0 8px;
+  color: var(--blue);
+  font-size: 1.45rem;
+}
+
+.info-dot {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8e9fb7;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.meter {
+  height: 5px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: #dce6f2;
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  width: 68%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.meter.blue span {
+  background: #7abdf2;
+}
+
+.meter.rose span {
+  background: var(--rose);
+}
+
+.benefit-list {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.actions {
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.primary-button,
+.secondary-button,
+.warranty-action,
+.text-button {
+  padding: 11px 16px;
+  font-weight: 700;
+}
+
+.primary-button {
+  border: 1px solid #2f97ef;
+  background: #f2f9ff;
+  color: #1156a4;
+}
+
+.secondary-button {
+  background: #fff;
+}
+
+.stacked-actions {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.warranty-action {
+  border: 1px solid #79e3a1;
+  background: #ecfff2;
+  color: #146a3c;
+}
+
+.text-button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.detail-panel {
+  padding: 12px;
+}
+
+.detail-hero {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.detail-badge {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1c95ef 0%, #0f63c7 100%);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.equipment-panel {
+  margin-top: 10px;
+  padding: 12px 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.equipment-grid {
+  margin-top: 10px;
+}
+
+.equipment-grid article {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+
+.equipment-type {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: #365478;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.secondary-paths {
+  align-self: start;
+}
+
+.secondary-paths h3 {
+  margin-top: 4px;
+  font-size: 1.4rem;
+}
+
+.compact-header {
+  display: block;
+}
+
+.alternate-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.option-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.option-card.selected {
+  border-color: var(--blue);
+  box-shadow: inset 0 0 0 1px rgba(28, 149, 239, 0.25);
+}
+
+.price-note {
+  margin: 6px 0 8px;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.secondary-state .status-pill {
+  border-color: #f1bf8f;
+  background: #fff5ea;
+  color: #a45307;
+}
+
+.secondary-state .primary-path,
+.secondary-state .warranty-action {
+  border-color: #f1bf8f;
+}
+
+.secondary-state .warranty-action {
+  background: #fff8f1;
+  color: #9d5a16;
+}
+
+@media (max-width: 900px) {
+  .builder-header,
+  .section-label-row,
+  .detail-hero,
+  .equipment-grid,
+  .controls-grid {
+    flex-direction: column;
+  }
+
+  .recommendation-layout,
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-pill {
+    white-space: normal;
+  }
+}
