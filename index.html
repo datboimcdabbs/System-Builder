@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Builder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="intro-card">
+        <p class="eyebrow">System Builder</p>
+        <div class="intro-header">
+          <div>
+            <h1>Direct Replacement should lead the page.</h1>
+            <p class="hero-copy">
+              Use the current system selection and ductwork condition to keep the
+              like-for-like replacement path front and center, while still giving
+              homeowners a smaller area to explore conversions.
+            </p>
+          </div>
+          <span class="status-pill" id="recommendation-pill">Direct Replacement Recommended</span>
+        </div>
+      </section>
+
+      <section class="builder-card" aria-labelledby="selection-heading">
+        <div class="builder-header">
+          <div>
+            <p class="section-kicker">Current homeowner profile</p>
+            <h2 id="selection-heading">Current system selection</h2>
+          </div>
+        </div>
+
+        <div class="controls-grid">
+          <fieldset>
+            <legend>Existing system type</legend>
+            <label>
+              <input type="radio" name="system-type" value="split" checked />
+              Split system
+            </label>
+            <label>
+              <input type="radio" name="system-type" value="package" />
+              Packaged unit
+            </label>
+            <label>
+              <input type="radio" name="system-type" value="dual-fuel" />
+              Dual fuel
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Ductwork condition</legend>
+            <label>
+              <input type="radio" name="ductwork" value="good" checked />
+              Good / homeowner says it is good
+            </label>
+            <label>
+              <input type="radio" name="ductwork" value="unsure" />
+              Unsure
+            </label>
+            <label>
+              <input type="radio" name="ductwork" value="poor" />
+              Poor / needs attention
+            </label>
+          </fieldset>
+        </div>
+
+        <section class="primary-path emphasis" id="primary-path" aria-labelledby="primary-path-heading">
+          <div class="section-label-row">
+            <div>
+              <div class="card-label">Recommended path</div>
+              <h3 id="primary-path-heading">Direct Replacement</h3>
+              <p class="section-description">
+                Keep the same system family, move quickly to quote, and show the
+                homeowner why this is the easiest fit when the ductwork is in good shape.
+              </p>
+            </div>
+            <button type="button" class="ghost-button">View detailed system features</button>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <div class="metric-title-row">
+                <h4>Install speed</h4>
+                <span class="info-dot">i</span>
+              </div>
+              <strong>Fastest path</strong>
+              <div class="meter blue"><span></span></div>
+              <p>Minimal design changes and faster quoting.</p>
+            </article>
+            <article class="metric-card">
+              <div class="metric-title-row">
+                <h4>Ductwork fit</h4>
+                <span class="info-dot">i</span>
+              </div>
+              <strong>High match</strong>
+              <div class="meter blue"><span></span></div>
+              <p>Best when existing ducts are good or believed to be good.</p>
+            </article>
+            <article class="metric-card">
+              <div class="metric-title-row">
+                <h4>Homeowner effort</h4>
+                <span class="info-dot">i</span>
+              </div>
+              <strong>Lowest friction</strong>
+              <div class="meter rose"><span></span></div>
+              <p>Fewer change orders, less rework, and a simpler approval path.</p>
+            </article>
+          </div>
+
+          <div class="stacked-actions">
+            <button type="button" class="accordion-action">Continue with Direct Replacement</button>
+            <button type="button" class="warranty-action">View this system's warranty</button>
+          </div>
+
+          <section class="detail-panel">
+            <div class="detail-hero">
+              <div class="detail-badge">DR</div>
+              <div>
+                <h4>Full installation and service details</h4>
+                <p>
+                  Position the like-for-like option as the most dependable next step.
+                  Explain that the existing layout, controls, and duct path are already the
+                  closest match for a smooth replacement.
+                </p>
+              </div>
+            </div>
+
+            <div class="equipment-panel">
+              <div class="equipment-title">Selected equipment</div>
+              <div class="equipment-grid">
+                <article>
+                  <span class="equipment-type">Outdoor unit</span>
+                  <strong>Matched condenser replacement</strong>
+                  <p>Uses the current footprint and line-set assumptions.</p>
+                </article>
+                <article>
+                  <span class="equipment-type">Indoor unit</span>
+                  <strong>Compatible air handler / coil pairing</strong>
+                  <p>Supports a fast swap while staying in the same system family.</p>
+                </article>
+              </div>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <section class="secondary-paths" aria-labelledby="alternate-heading">
+        <div class="secondary-header">
+          <div>
+            <div class="card-label subdued">Just in case</div>
+            <h3 id="alternate-heading">Different systems to consider</h3>
+            <p>
+              Keep these visible, but smaller and lower on the page, for homeowners who
+              may actually want to convert instead of replacing in-kind.
+            </p>
+          </div>
+          <button type="button" class="ghost-button compact">Compare choices</button>
+        </div>
+
+        <div class="alternate-groups">
+          <section class="option-group">
+            <div class="option-group-header">
+              <h4>Conversion options</h4>
+              <button type="button" class="ghost-button compact">Compare choices</button>
+            </div>
+            <div class="alternate-options two-up">
+              <article class="option-card selected">
+                <h5>Heat pump conversion</h5>
+                <div class="price-note">Best alternate fit</div>
+                <p>Good for customers asking about electrification or seasonal efficiency gains.</p>
+              </article>
+              <article class="option-card">
+                <h5>Ductless mini-split</h5>
+                <div class="price-note">+ zoning flexibility</div>
+                <p>Useful when they want room-by-room control or have addition spaces to cover.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="option-group collapsible-row">
+            <button type="button" class="collapse-trigger">
+              <span>Packaged unit swap</span>
+              <span>⌄</span>
+            </button>
+          </section>
+
+          <section class="option-group collapsible-row">
+            <button type="button" class="collapse-trigger">
+              <span>Hybrid / dual-fuel changeover</span>
+              <span>⌄</span>
+            </button>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
