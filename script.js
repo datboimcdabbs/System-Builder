@@ -22,6 +22,7 @@ const systemsWithDuctwork = [
   { label: "A/C and Fan Coil", image: "https://lh3.googleusercontent.com/p/AF1QipOYI5hRFCWUihGVLl3PvdRIYCreBIcUfdAle7iY=s680-w680-h510-rw", fuelType: "electric", targetType: "Fan Coil" },
   { label: "Oil Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipPzRhfEv4pEkj0TGFHQElJNpEzbDFDLMrr6lCI-=s680-w680-h510-rw", fuelType: "oil", targetType: "Oil Furnace" },
   { label: "Gas Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipMlZNC6hgmIyl9yPnI05gesLa-8vwJ9B0ST2xdD=s680-w680-h510-rw", fuelType: "gas", targetType: "Gas Furnace" },
+  { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw", fuelType: null, targetType: null },
 ];
 
 const systemsWithoutDuctwork = [
@@ -30,6 +31,7 @@ const systemsWithoutDuctwork = [
   { label: "Gas Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipN7oPZ-9P52te-Uu-k4AYd0X_IYtUyl4C9Kyvdj=s680-w680-h510-rw" },
   { label: "Gas Combi-Boiler/Tankless Water Heater", image: "assets/combi-boiler.svg" },
   { label: "Mini Split (Indoor and Outdoor Units)", image: "assets/mini-split.svg" },
+  { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw" },
 ];
 
 const ductConditionOptions = [
