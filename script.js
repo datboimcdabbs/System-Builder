@@ -150,6 +150,9 @@ function createThumbnailCard(option, highlightMatcher) {
   const card = document.createElement("button");
   card.type = "button";
   card.className = "thumbnail-card";
+  if (option.cardClass) {
+    card.classList.add(option.cardClass);
+  }
 
   if (highlightMatcher && highlightMatcher(option)) {
     const badge = document.createElement("span");
@@ -292,6 +295,27 @@ function isDirectReplacement(option) {
   return option.label.startsWith(state.currentSystem);
 }
 
+function resetSizingInputs() {
+  state.homeSquareFeet = null;
+  state.knowsCurrentSize = null;
+  state.currentKnownCoolingSize = null;
+  state.currentKnownFurnaceSize = null;
+}
+
+function selectDesiredDuctedSystem(option) {
+  state.desiredSystem = option;
+  resetSizingInputs();
+
+  if (isDirectReplacement(option)) {
+    state.conversionPageTitle = null;
+    continueToSizingFlow();
+    return;
+  }
+
+  state.conversionPageTitle = getConversionPageTitle(option);
+  renderSystemConversionPage();
+}
+
 function getConversionPageTitle(targetSystem) {
   const fromLabel = state.currentTargetType || fuelLabel[state.currentFuelType] || "Current System";
   const toLabel = targetSystem.targetType || fuelLabel[targetSystem.fuelType] || "New System";
@@ -311,28 +335,57 @@ function continueToSizingFlow() {
   renderHomeSizeQuestion();
 }
 
+function renderOtherDesiredDuctedSystems() {
+  renderThumbnailQuestion({
+    title: "What type of system are you looking to get installed?",
+    subtitle: "Choose something other than a direct replacement below.",
+    options: desiredDuctedSystems
+      .filter((option) => !isDirectReplacement(option))
+      .map((option) => ({
+        ...option,
+        onClick: () => selectDesiredDuctedSystem(option),
+      })),
+    onBack: renderDesiredDuctedSystem,
+    cardClass: "thumbnail-grid--portrait-systems",
+  });
+}
+
 function renderDesiredDuctedSystem() {
+  const directReplacementOption = desiredDuctedSystems.find((option) => isDirectReplacement(option));
+  const somethingElseImage =
+    systemsWithDuctwork.find((option) => option.label === "Not Sure")?.image || directReplacementOption?.image;
+
+  if (directReplacementOption && state.currentSystem !== "Not Sure") {
+    renderThumbnailQuestion({
+      title: "What type of system are you looking to get installed?",
+      subtitle:
+        "Most homeowners replace their system with a like-for-like option. Choose the direct replacement below, or select Something Else to see all other options.",
+      options: [
+        {
+          ...directReplacementOption,
+          cardClass: "thumbnail-card--featured-direct",
+          onClick: () => selectDesiredDuctedSystem(directReplacementOption),
+        },
+        {
+          label: "Something Else",
+          image: somethingElseImage,
+          cardClass: "thumbnail-card--something-else",
+          onClick: () => renderOtherDesiredDuctedSystems(),
+        },
+      ],
+      onBack: renderDuctCondition,
+      highlightMatcher: (option) => option.label === directReplacementOption.label,
+      cardClass: "thumbnail-grid--featured-direct",
+    });
+    return;
+  }
+
   renderThumbnailQuestion({
     title: "What type of system are you looking to get installed?",
     subtitle: "All ducted replacement systems qualify for 10 Years of Free Maintenance!",
     options: desiredDuctedSystems.map((option) => ({
       ...option,
-      onClick: () => {
-        state.desiredSystem = option;
-        state.homeSquareFeet = null;
-  state.knowsCurrentSize = null;
-  state.currentKnownCoolingSize = null;
-  state.currentKnownFurnaceSize = null;
-
-        if (isDirectReplacement(option)) {
-          state.conversionPageTitle = null;
-          continueToSizingFlow();
-          return;
-        }
-
-        state.conversionPageTitle = getConversionPageTitle(option);
-        renderSystemConversionPage();
-      },
+      onClick: () => selectDesiredDuctedSystem(option),
     })),
     onBack: renderDuctCondition,
     highlightMatcher: (option) => isDirectReplacement(option),
