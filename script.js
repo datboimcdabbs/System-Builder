@@ -1,0 +1,1178 @@
+const wizard = document.getElementById("wizard");
+
+const ductworkPresenceOptions = [
+  { label: "Ductwork and Vents", image: "https://www.novakheating.com/wp-content/webp-express/webp-images/uploads/2022/09/Novak_Ducts-vs.-Vents-1.png.webp", value: true },
+  { label: "Mini-Split(s), Hot Water Baseboards or Something else...", image: "https://fredelectric.com/wp-content/uploads/2026/01/Baseboard-Heaters-to-Heat-Pump-Blog-1024x576.png", value: false },
+];
+
+const systemsWithDuctwork = [
+  { label: "Heat Pump System", image: "https://static.wixstatic.com/media/f2f928_4bcc05fad65f4c83a96be046c5173a6f~mv2.jpg", fuelType: "electric", targetType: "Heat Pump" },
+  {
+    label: "A/C and Gas Furnace",
+    image: "https://static.wixstatic.com/media/f2f928_3eb31471ad93436fbc41fe89461ea2c1~mv2.png",
+    desiredImage: "https://static.wixstatic.com/media/f2f928_6d291e542dd14a6185dbb522a6c97de1~mv2.png",
+    fuelType: "gas",
+    targetType: "Gas Furnace",
+  },
+  {
+    label: "A/C and Oil Furnace",
+    image: "https://static.wixstatic.com/media/f2f928_7c6c03800e274a7dafe42cd972376f16~mv2.jpg",
+    fuelType: "oil",
+    targetType: "Oil Furnace",
+  },
+  { label: "A/C Only", image: "https://static.wixstatic.com/media/f2f928_1ecf3d68edbe4deba7da9da7fcb7d411~mv2.jpg", fuelType: "electric", targetType: "Fan Coil" },
+  { label: "Oil Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipPzRhfEv4pEkj0TGFHQElJNpEzbDFDLMrr6lCI-=s680-w680-h510-rw", fuelType: "oil", targetType: "Oil Furnace" },
+  { label: "Gas Furnace Only", image: "https://static.wixstatic.com/media/f2f928_f9f434dd801a4b9bb392adde03a43429~mv2.png", fuelType: "gas", targetType: "Gas Furnace" },
+  { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw", fuelType: null, targetType: null },
+];
+
+const systemsWithoutDuctwork = [
+  { label: "I don’t have any system in my home, but I want one!", image: "https://static.wixstatic.com/media/f2f928_1ad05155e5e54bd3b86fed2c29f03f76~mv2.jpeg" },
+  { label: "Oil Boiler", image: "https://static.wixstatic.com/media/91d1a1_00b2b0a3361c4d7fb0215ce82fefc286~mv2.jpg" },
+  { label: "Gas Boiler", image: "https://static.wixstatic.com/media/f2f928_d38275ca84ea46d094dd5da270a6fab2~mv2.jpeg" },
+  { label: "Gas Combi-Boiler/Tankless Water Heater", image: "https://static.wixstatic.com/media/f2f928_c2ffd9f26a3b463a8d7aa78cbdea44e8~mv2.png" },
+  { label: "Mini Split (Indoor and Outdoor Units)", image: "https://static.wixstatic.com/media/f2f928_a915f5764e6547fbbc8b8ed877a7fb17~mv2.jpg" },
+  { label: "Not Sure", image: "https://static.wixstatic.com/media/f2f928_91b81ad5a02844fb8e6e531e2c5ab02e~mv2.jpeg" },
+];
+
+const ductConditionOptions = [
+  {
+    label: "Yes, I believe my ductwork is in usable condition.",
+    image: "https://static.wixstatic.com/media/f2f928_25efaf4cad37442b919a7cb53376146f~mv2.png",
+    onSelect: () => renderDesiredDuctedSystem(),
+  },
+  {
+    label: "It may need some small improvements or minor leak sealing",
+    image: "https://static.wixstatic.com/media/f2f928_67b5166d2b4a4f39bcc4542f5c9bf60b~mv2.jpg",
+    expandableCopy:
+      "We always confirm the ductwork during your free Pre-Install Verification appointment, to make sure that your existing ducts can provide the best comfort with your new system!",
+    onSelect: () => renderDesiredDuctedSystem(),
+  },
+  {
+    label: "I believe that some or all of my ductwork may need to be replaced.",
+    image: "https://static.wixstatic.com/media/f2f928_33f733644e07493c8fbfa316e8615fb9~mv2.jpeg",
+    onSelect: () => renderContactPage(),
+  },
+];
+
+const gasEfficiencyOptions = [
+  {
+    key: "standard",
+    label: "Standard Efficiency Gas Furnace",
+    image: "https://static.wixstatic.com/media/f2f928_f9f434dd801a4b9bb392adde03a43429~mv2.png",
+  },
+  {
+    key: "high",
+    label: "High Efficiency Gas Furnace",
+    image: "https://static.wixstatic.com/media/f2f928_9b366de40bbf4624b95d451d54ec4bab~mv2.jpeg",
+  },
+  {
+    key: "upgrade",
+    label: "I have a Standard Gas Furnace But I want a High Efficiency Upgrade",
+    image: "https://static.wixstatic.com/media/f2f928_6a13520d06104319b9cf8674ece135e7~mv2.png",
+  },
+];
+
+const desiredDuctedSystems = systemsWithDuctwork.map((item) => ({
+  ...item,
+  image: item.desiredImage || item.image,
+  label: `${item.label} (Using Your Existing Ductwork)`,
+}));
+
+const fuelLabel = {
+  gas: "Gas",
+  oil: "Oil",
+  electric: "Electric",
+};
+
+
+const systemSizeReference = [
+  { ton: "1.5 ton", coolingBTU: "18,000 BTU", homeMin: 600, homeMax: 900, furnaceRange: "30k – 45k BTU" },
+  { ton: "2 ton", coolingBTU: "24,000 BTU", homeMin: 900, homeMax: 1200, furnaceRange: "40k – 60k BTU" },
+  { ton: "2.5 ton", coolingBTU: "30,000 BTU", homeMin: 1200, homeMax: 1500, furnaceRange: "50k – 70k BTU" },
+  { ton: "3 ton", coolingBTU: "36,000 BTU", homeMin: 1500, homeMax: 1800, furnaceRange: "60k – 80k BTU" },
+  { ton: "3.5 ton", coolingBTU: "42,000 BTU", homeMin: 1800, homeMax: 2100, furnaceRange: "70k – 90k BTU" },
+  { ton: "4 ton", coolingBTU: "48,000 BTU", homeMin: 2100, homeMax: 2400, furnaceRange: "80k – 100k BTU" },
+  { ton: "5 ton", coolingBTU: "60,000 BTU", homeMin: 2400, homeMax: 3000, furnaceRange: "100k – 120k BTU" },
+];
+
+const furnaceOnlyReference = [
+  { output: "40,000 BTU", homeMin: 800, homeMax: 1000 },
+  { output: "60,000 BTU", homeMin: 1200, homeMax: 1500 },
+  { output: "80,000 BTU", homeMin: 1600, homeMax: 2000 },
+  { output: "100,000 BTU", homeMin: 2000, homeMax: 2500 },
+  { output: "120,000 BTU", homeMin: 2500, homeMax: 3000 },
+];
+
+const state = {
+  hasDuctwork: null,
+  currentSystem: null,
+  currentFuelType: null,
+  currentTargetType: null,
+  desiredSystem: null,
+  conversionPageTitle: null,
+  gasEfficiency: null,
+  homeSquareFeet: null,
+  knowsCurrentSize: null,
+  currentKnownCoolingSize: null,
+  currentKnownFurnaceSize: null,
+  systemLocation: null,
+};
+
+function clearWizard() {
+  wizard.innerHTML = "";
+}
+
+function getOptimizedThumbnailUrl(url) {
+  if (!url || url.startsWith("assets/")) {
+    return url;
+  }
+
+  if (url.includes("googleusercontent.com") && url.includes("=")) {
+    return url.replace(/=s\d+[^"]*$/, "=s480");
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.hostname === "1drv.ms") {
+      parsedUrl.searchParams.set("width", "480");
+      if (parsedUrl.searchParams.has("height")) {
+        parsedUrl.searchParams.set("height", "640");
+      }
+      return parsedUrl.toString();
+    }
+  } catch {
+    return url;
+  }
+
+  return url;
+}
+
+function createThumbnailCard(option, highlightMatcher) {
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = "thumbnail-card";
+  if (option.cardClass) {
+    card.classList.add(option.cardClass);
+  }
+
+  if (highlightMatcher && highlightMatcher(option)) {
+    const badge = document.createElement("span");
+    badge.className = "direct-badge";
+    badge.textContent = "Direct Replacement";
+    card.appendChild(badge);
+  }
+
+  const img = document.createElement("img");
+  img.src = getOptimizedThumbnailUrl(option.image);
+  img.alt = option.label;
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.fetchPriority = "low";
+
+  const text = document.createElement("span");
+  text.textContent = option.label;
+
+  card.append(img, text);
+  return card;
+}
+
+function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMatcher, cardClass, centeredHeading = false }) {
+  clearWizard();
+  const template = document.getElementById("thumbnail-question-template").content.cloneNode(true);
+  const titleElement = template.querySelector(".panel-title");
+  const subtitleElement = template.querySelector(".panel-subtitle");
+  titleElement.textContent = title;
+  subtitleElement.textContent = subtitle || "";
+
+  if (centeredHeading) {
+    titleElement.classList.add("panel-title--centered");
+    subtitleElement.classList.add("panel-subtitle--centered");
+  }
+
+  const grid = template.querySelector('[data-role="thumbnail-options"]');
+
+  if (cardClass) {
+    grid.classList.add(cardClass);
+  }
+
+  options.forEach((option) => {
+    const card = createThumbnailCard(option, highlightMatcher);
+    card.addEventListener("click", option.onClick);
+    grid.appendChild(card);
+
+    if (option.expandableCopy) {
+      const expandable = document.createElement("div");
+      expandable.className = "expand-copy";
+      expandable.hidden = true;
+      expandable.innerHTML = `
+        <p>${option.expandableCopy}</p>
+        <button class="primary-btn" type="button">Continue</button>
+      `;
+      expandable.querySelector("button").addEventListener("click", (event) => {
+        event.stopPropagation();
+        option.onClick();
+      });
+      card.addEventListener("click", () => {
+        expandable.hidden = !expandable.hidden;
+      });
+      grid.appendChild(expandable);
+    }
+  });
+
+  const backBtn = template.querySelector('[data-role="back-button"]');
+  if (onBack) {
+    backBtn.addEventListener("click", onBack);
+  } else {
+    backBtn.remove();
+  }
+
+  wizard.appendChild(template);
+}
+
+function resetDuctedPathState() {
+  state.desiredSystem = null;
+  state.conversionPageTitle = null;
+  state.gasEfficiency = null;
+  state.homeSquareFeet = null;
+  state.knowsCurrentSize = null;
+  state.currentKnownCoolingSize = null;
+  state.currentKnownFurnaceSize = null;
+  state.systemLocation = null;
+}
+
+function renderStart() {
+  state.hasDuctwork = null;
+  state.currentSystem = null;
+  state.currentFuelType = null;
+  state.currentTargetType = null;
+  resetDuctedPathState();
+
+  renderThumbnailQuestion({
+    title: "How does your home currently deliver heating and cooling?",
+    subtitle: "Select the option below that best matches your home today.",
+    options: ductworkPresenceOptions.map((option) => ({
+      ...option,
+      onClick: () => {
+        state.hasDuctwork = option.value;
+        renderCurrentSystemQuestion();
+      },
+    })),
+    onBack: null,
+  });
+}
+
+function renderCurrentSystemQuestion() {
+  const list = state.hasDuctwork ? systemsWithDuctwork : systemsWithoutDuctwork;
+  renderThumbnailQuestion({
+    title: "What type of system do you have?",
+    subtitle: "What system currently heats and/or cools your home?",
+    options: list.map((option) => ({
+      ...option,
+      onClick: () => {
+        state.currentSystem = option.label;
+        state.currentFuelType = option.fuelType || null;
+        state.currentTargetType = option.targetType || null;
+        resetDuctedPathState();
+
+        if (state.hasDuctwork) {
+          renderDuctCondition();
+          return;
+        }
+
+        renderContactPage();
+      },
+    })),
+    onBack: renderStart,
+    cardClass: "thumbnail-grid--portrait-systems",
+  });
+}
+
+function renderDuctCondition() {
+  renderThumbnailQuestion({
+    title: "Is your ductwork and registers in usable condition?",
+    subtitle:
+      "All ducted replacement systems qualify for 10 Years of Free Maintenance! We’ve seen it all—some ductwork systems have more holes than my dad’s socks, and some have become a home for a family of raccoons (you would probably know if this applies to you). We have even conducted a cat rescue mission in a customer's ductwork (the cat was upset at us when we pulled her out, but otherwise she’s happy and healthy to this day!).",
+    options: ductConditionOptions.map((option) => ({
+      ...option,
+      onClick: option.onSelect,
+    })),
+    onBack: renderCurrentSystemQuestion,
+    cardClass: "thumbnail-grid--duct-condition",
+  });
+}
+
+function isDirectReplacement(option) {
+  return option.label.startsWith(state.currentSystem);
+}
+
+function resetSizingInputs() {
+  state.homeSquareFeet = null;
+  state.knowsCurrentSize = null;
+  state.currentKnownCoolingSize = null;
+  state.currentKnownFurnaceSize = null;
+  state.systemLocation = null;
+}
+
+function selectDesiredDuctedSystem(option) {
+  state.desiredSystem = option;
+  resetSizingInputs();
+
+  if (isDirectReplacement(option)) {
+    state.conversionPageTitle = null;
+    continueToSizingFlow();
+    return;
+  }
+
+  state.conversionPageTitle = getConversionPageTitle(option);
+  renderSystemConversionPage();
+}
+
+function getConversionPageTitle(targetSystem) {
+  const fromLabel = state.currentTargetType || fuelLabel[state.currentFuelType] || "Current System";
+  const toLabel = targetSystem.targetType || fuelLabel[targetSystem.fuelType] || "New System";
+  return `${fromLabel} to ${toLabel} Page`;
+}
+
+function isGasSystemSelection() {
+  return state.currentSystem === "A/C and Gas Furnace" || state.currentSystem === "Gas Furnace Only";
+}
+
+function continueToSizingFlow() {
+  if (isGasSystemSelection() && !state.gasEfficiency) {
+    renderGasEfficiencyQuestion();
+    return;
+  }
+
+  if (shouldAskSystemLocationQuestion()) {
+    renderSystemLocationQuestion();
+    return;
+  }
+
+  renderHomeSizeQuestion();
+}
+
+function shouldAskSystemLocationQuestion() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return isHeatPumpSelection() || state.desiredSystem.targetType === "Fan Coil" || isSplitACAndFurnaceSelection() || isFurnaceOnlySelection();
+}
+
+function getSystemLocationOptions() {
+  if (!shouldAskSystemLocationQuestion()) {
+    return [];
+  }
+
+  if (isFurnaceOnlySelection()) {
+    return [
+      { label: "Furnace Unit in Attic", value: "furnace_attic" },
+      { label: "Furnace Unit in Basement", value: "furnace_basement" },
+    ];
+  }
+
+  return [
+    { label: "Outdoor Unit and Indoor Unit in Attic", value: "split_attic" },
+    { label: "Outdoor Unit and Indoor Unit in Basement", value: "split_basement" },
+  ];
+}
+
+function renderSystemLocationQuestion() {
+  clearWizard();
+  const options = getSystemLocationOptions();
+  const buttons = options
+    .map(
+      (option) => `
+        <button
+          class="${state.systemLocation === option.value ? "primary-btn selected-size-btn" : "secondary-btn"} glowing-btn"
+          type="button"
+          data-role="system-location"
+          data-location="${option.value}"
+        >
+          ${option.label}
+        </button>
+      `,
+    )
+    .join("");
+
+  wizard.innerHTML = `
+    <h2 class="panel-title">Do you know your system’s location?</h2>
+    <p class="panel-subtitle">Choose the option that best matches your setup.</p>
+    <div class="know-size-block">
+      <div class="option-row">${buttons}</div>
+    </div>
+    <button class="secondary-btn" type="button" data-role="back-button">Back</button>
+  `;
+
+  wizard.querySelectorAll('button[data-role="system-location"]').forEach((button) => {
+    button.addEventListener("click", () => {
+      state.systemLocation = button.getAttribute("data-location");
+      renderHomeSizeQuestion();
+    });
+  });
+
+  wizard.querySelector('[data-role="back-button"]').addEventListener("click", () => {
+    if (isGasSystemSelection()) {
+      renderGasEfficiencyQuestion();
+      return;
+    }
+
+    if (state.conversionPageTitle) {
+      renderSystemConversionPage();
+      return;
+    }
+
+    renderDesiredDuctedSystem();
+  });
+}
+
+function renderOtherDesiredDuctedSystems() {
+  renderThumbnailQuestion({
+    title: "What type of system are you looking to get installed?",
+    subtitle: "Choose something other than a direct replacement below.",
+    options: desiredDuctedSystems
+      .filter((option) => !isDirectReplacement(option))
+      .map((option) => ({
+        ...option,
+        onClick: () => selectDesiredDuctedSystem(option),
+    })),
+    onBack: renderDesiredDuctedSystem,
+    cardClass: "thumbnail-grid--portrait-systems",
+    centeredHeading: true,
+  });
+}
+
+function renderDesiredDuctedSystem() {
+  const directReplacementOption = desiredDuctedSystems.find((option) => isDirectReplacement(option));
+
+  if (directReplacementOption && state.currentSystem !== "Not Sure") {
+    clearWizard();
+    const title = document.createElement("h2");
+    title.className = "panel-title panel-title--centered";
+    title.textContent = "What type of system are you looking to get installed?";
+
+    const subtitle = document.createElement("p");
+    subtitle.className = "panel-subtitle panel-subtitle--centered";
+    subtitle.textContent =
+      "Most homeowners replace their system with a like-for-like option. Choose the direct replacement below, or select the button underneath to see all other options.";
+
+    const grid = document.createElement("div");
+    grid.className = "thumbnail-grid thumbnail-grid--featured-direct";
+
+    const directCard = createThumbnailCard(
+      {
+        ...directReplacementOption,
+        cardClass: "thumbnail-card--featured-direct",
+      },
+      (option) => option.label === directReplacementOption.label,
+    );
+    directCard.addEventListener("click", () => selectDesiredDuctedSystem(directReplacementOption));
+    grid.appendChild(directCard);
+
+    const actions = document.createElement("div");
+    actions.className = "featured-direct-actions";
+
+    const somethingElseButton = document.createElement("button");
+    somethingElseButton.type = "button";
+    somethingElseButton.className = "secondary-btn featured-direct-secondary-btn";
+    somethingElseButton.textContent = "I’m looking for something else to replace my existing unit";
+    somethingElseButton.addEventListener("click", renderOtherDesiredDuctedSystems);
+
+    const backButton = document.createElement("button");
+    backButton.type = "button";
+    backButton.className = "secondary-btn";
+    backButton.textContent = "Back";
+    backButton.addEventListener("click", renderDuctCondition);
+
+    actions.append(somethingElseButton, backButton);
+    wizard.append(title, subtitle, grid, actions);
+    return;
+  }
+
+  renderThumbnailQuestion({
+    title: "What type of system are you looking to get installed?",
+    subtitle: "All ducted replacement systems qualify for 10 Years of Free Maintenance!",
+    options: desiredDuctedSystems.map((option) => ({
+      ...option,
+      onClick: () => selectDesiredDuctedSystem(option),
+    })),
+    onBack: renderDuctCondition,
+    highlightMatcher: (option) => isDirectReplacement(option),
+    cardClass: "thumbnail-grid--portrait-systems",
+    centeredHeading: true,
+  });
+}
+
+function renderDuctedSelectionPage() {
+  clearWizard();
+  wizard.innerHTML = `
+    <h2 class="panel-title">Selected System Path</h2>
+    <p class="panel-subtitle">
+      You currently have <strong>${state.currentSystem}</strong> and selected
+      <strong>${state.desiredSystem.label.replace(" (Using Your Existing Ductwork)", "")}</strong>.
+    </p>
+    <div class="option-row">
+      <button class="primary-btn" type="button" data-role="to-sizing">Continue to System Selection</button>
+      <button class="secondary-btn" type="button" data-role="to-desired">Back to System Choices</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", continueToSizingFlow);
+  wizard.querySelector('[data-role="to-desired"]').addEventListener("click", renderDesiredDuctedSystem);
+}
+
+function renderSystemConversionPage() {
+  clearWizard();
+  const desiredLabel = state.desiredSystem.label.replace(" (Using Your Existing Ductwork)", "");
+
+  wizard.innerHTML = `
+    <h2 class="panel-title">${state.conversionPageTitle}</h2>
+    <p class="panel-subtitle">
+      You currently have <strong>${state.currentSystem}</strong> and selected
+      <strong>${desiredLabel}</strong>.
+    </p>
+    <p class="panel-subtitle">
+      Stand-in page for this specific conversion setup. During your free Pre-Install Verification,
+      we’ll confirm design requirements, equipment compatibility, electrical/fuel updates, and available rebates.
+    </p>
+    <div class="option-row">
+      <button class="primary-btn" type="button" data-role="to-sizing">Continue to System Selection</button>
+      <button class="secondary-btn" type="button" data-role="to-desired">Back to System Choices</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", continueToSizingFlow);
+  wizard.querySelector('[data-role="to-desired"]').addEventListener("click", renderDesiredDuctedSystem);
+}
+
+function renderGasEfficiencyQuestion() {
+  renderThumbnailQuestion({
+    title: "What gas furnace efficiency do you currently have?",
+    subtitle: "Choose the option that best matches your current gas setup.",
+    options: gasEfficiencyOptions.map((option) => ({
+      ...option,
+      onClick: () => {
+        if (option.key === "upgrade") {
+          renderHighEfficiencyUpgradePage();
+          return;
+        }
+
+        state.gasEfficiency = option.key;
+        continueToSizingFlow();
+      },
+    })),
+    onBack: () => {
+      if (state.conversionPageTitle) {
+        renderSystemConversionPage();
+      } else {
+        renderDesiredDuctedSystem();
+      }
+    },
+    cardClass: "thumbnail-grid--xl",
+  });
+}
+
+function renderHighEfficiencyUpgradePage() {
+  clearWizard();
+  state.gasEfficiency = "standard_to_high_upgrade";
+  wizard.innerHTML = `
+    <h2 class="panel-title">High Efficiency Furnace Upgrade Page</h2>
+    <p class="panel-subtitle">
+      Great choice. We’ll evaluate venting updates, condensate handling, and airflow requirements needed
+      for a high-efficiency gas furnace upgrade.
+    </p>
+    <div class="option-row">
+      <button class="primary-btn" type="button" data-role="to-sizing">Continue to System Sizing</button>
+      <button class="secondary-btn" type="button" data-role="to-efficiency">Back to Efficiency Options</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", continueToSizingFlow);
+  wizard.querySelector('[data-role="to-efficiency"]').addEventListener("click", renderGasEfficiencyQuestion);
+}
+
+function isSplitACAndFurnaceSelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return (
+    state.desiredSystem.label.startsWith("A/C and Gas Furnace") ||
+    state.desiredSystem.label.startsWith("A/C and Oil Furnace")
+  );
+}
+
+function renderKnownSizeOptionButtons({ title, options, dataRole, selectedValue }) {
+  const buttons = options
+    .map(
+      (value) =>
+        `<button class="primary-btn glowing-btn ${selectedValue === value ? "selected-size-btn" : ""}" type="button" data-role="${dataRole}" data-size="${value}">${value}</button>`,
+    )
+    .join("");
+
+  return `
+    <div class="size-options-group">
+      <p class="know-size-subtitle">${title}</p>
+      <div class="option-row know-size-options">${buttons}</div>
+    </div>
+  `;
+}
+
+function renderHomeSizeQuestion() {
+  clearWizard();
+  const shouldShowCoolingOptions = !isFurnaceOnlySelection();
+  const shouldShowFurnaceOptions = isFurnaceBasedSelection() || isSplitACAndFurnaceSelection();
+
+  wizard.innerHTML = `
+    <h2 class="panel-title">System Size Details</h2>
+    <p class="panel-subtitle">Do you know the size of your current system?</p>
+    <div class="know-size-block">
+      <div class="option-row">
+        <button class="primary-btn glowing-btn" type="button" data-role="know-size-yes">Yes, I know my current size</button>
+        <button class="secondary-btn glowing-btn" type="button" data-role="know-size-no">No, use my square footage</button>
+      </div>
+      <div data-role="known-size-selections" hidden></div>
+    </div>
+
+    <form class="contact-form" data-role="size-form">
+      <label data-role="sqft-wrapper" hidden>
+        Home Size (Square Feet)
+        <input name="squareFeet" type="number" min="300" step="1" placeholder="e.g., 2200" />
+      </label>
+      <button class="primary-btn glowing-btn" type="submit">Continue</button>
+    </form>
+    <button class="secondary-btn" type="button" data-role="back-button">Back</button>
+  `;
+
+  const form = wizard.querySelector('[data-role="size-form"]');
+  const sqftWrapper = wizard.querySelector('[data-role="sqft-wrapper"]');
+  const input = form.querySelector('input[name="squareFeet"]');
+  const knowYesBtn = wizard.querySelector('[data-role="know-size-yes"]');
+  const knowNoBtn = wizard.querySelector('[data-role="know-size-no"]');
+  const knownSizeSelections = wizard.querySelector('[data-role="known-size-selections"]');
+
+  const coolingOptions = ["1.5 ton", "2 ton", "2.5 ton", "3 ton", "3.5 ton", "4 ton", "5 ton"];
+  const furnaceOptions = ["40,000 BTU", "60,000 BTU", "80,000 BTU", "100,000 BTU", "120,000 BTU"];
+
+  function updateKnowSizeModeButtons(isKnownSize) {
+    knowYesBtn.className = `${isKnownSize ? "primary-btn selected-size-btn" : "secondary-btn"} glowing-btn`;
+    knowNoBtn.className = `${isKnownSize ? "secondary-btn" : "primary-btn selected-size-btn"} glowing-btn`;
+  }
+
+  function renderKnownSizeSelectors() {
+    let markup = "";
+    if (shouldShowCoolingOptions) {
+      markup += renderKnownSizeOptionButtons({
+        title: "Current A/C / Heat Pump Size",
+        options: coolingOptions,
+        dataRole: "known-cooling-size",
+        selectedValue: state.currentKnownCoolingSize,
+      });
+    }
+
+    if (shouldShowFurnaceOptions) {
+      markup += renderKnownSizeOptionButtons({
+        title: "Current Furnace Size",
+        options: furnaceOptions,
+        dataRole: "known-furnace-size",
+        selectedValue: state.currentKnownFurnaceSize,
+      });
+    }
+
+    knownSizeSelections.innerHTML = markup;
+
+    knownSizeSelections.querySelectorAll('button[data-role="known-cooling-size"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.currentKnownCoolingSize = btn.getAttribute("data-size");
+        renderKnownSizeSelectors();
+      });
+    });
+
+    knownSizeSelections.querySelectorAll('button[data-role="known-furnace-size"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.currentKnownFurnaceSize = btn.getAttribute("data-size");
+        renderKnownSizeSelectors();
+      });
+    });
+  }
+
+  function enableKnownSizeMode() {
+    state.knowsCurrentSize = true;
+    updateKnowSizeModeButtons(true);
+    sqftWrapper.hidden = true;
+    input.required = false;
+    knownSizeSelections.hidden = false;
+    renderKnownSizeSelectors();
+  }
+
+  function enableSquareFootageMode() {
+    state.knowsCurrentSize = false;
+    updateKnowSizeModeButtons(false);
+    state.currentKnownCoolingSize = null;
+    state.currentKnownFurnaceSize = null;
+    knownSizeSelections.hidden = true;
+    sqftWrapper.hidden = false;
+    input.required = true;
+  }
+
+  if (state.knowsCurrentSize === false) {
+    enableSquareFootageMode();
+    if (state.homeSquareFeet) {
+      input.value = state.homeSquareFeet;
+    }
+  } else {
+    enableKnownSizeMode();
+  }
+
+  knowYesBtn.addEventListener("click", enableKnownSizeMode);
+  knowNoBtn.addEventListener("click", enableSquareFootageMode);
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (state.knowsCurrentSize) {
+      const needsCooling = shouldShowCoolingOptions && !state.currentKnownCoolingSize;
+      const needsFurnace = shouldShowFurnaceOptions && !state.currentKnownFurnaceSize;
+      if (needsCooling || needsFurnace) {
+        return;
+      }
+      state.homeSquareFeet = null;
+    } else {
+      state.homeSquareFeet = input.value;
+      if (!state.homeSquareFeet) {
+        return;
+      }
+    }
+
+    renderFinalStep();
+  });
+
+  wizard.querySelector('[data-role="back-button"]').addEventListener("click", () => {
+    if (shouldAskSystemLocationQuestion()) {
+      renderSystemLocationQuestion();
+      return;
+    }
+
+    if (isGasSystemSelection()) {
+      renderGasEfficiencyQuestion();
+      return;
+    }
+
+    if (state.conversionPageTitle) {
+      renderSystemConversionPage();
+      return;
+    }
+
+    renderDesiredDuctedSystem();
+  });
+}
+
+
+function getRecommendedSystemRange(squareFeet) {
+  if (!squareFeet) {
+    return null;
+  }
+
+  const numericSqFt = Number(squareFeet);
+  const overlaps = systemSizeReference.filter((item) => numericSqFt >= item.homeMin && numericSqFt <= item.homeMax);
+
+  if (overlaps.length > 0) {
+    return overlaps;
+  }
+
+  if (numericSqFt < systemSizeReference[0].homeMin) {
+    return [systemSizeReference[0]];
+  }
+
+  return [systemSizeReference[systemSizeReference.length - 1]];
+}
+
+function getRecommendedFurnaceOnlyRange(squareFeet) {
+  if (!squareFeet) {
+    return null;
+  }
+
+  const numericSqFt = Number(squareFeet);
+  const overlaps = furnaceOnlyReference.filter((item) => numericSqFt >= item.homeMin && numericSqFt <= item.homeMax);
+
+  if (overlaps.length > 0) {
+    const ordered = [...overlaps];
+    const first = ordered[0];
+    const firstIndex = furnaceOnlyReference.findIndex((item) => item.output === first.output);
+
+    // If square footage sits exactly on the lower boundary of a bracket,
+    // include the previous bracket as a valid neighboring option.
+    if (firstIndex > 0 && numericSqFt === first.homeMin) {
+      ordered.unshift(furnaceOnlyReference[firstIndex - 1]);
+    }
+
+    return ordered;
+  }
+
+  if (numericSqFt < furnaceOnlyReference[0].homeMin) {
+    return [furnaceOnlyReference[0]];
+  }
+
+  return [furnaceOnlyReference[furnaceOnlyReference.length - 1]];
+}
+
+
+function isHeatPumpSelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return state.desiredSystem.targetType === "Heat Pump";
+}
+
+function isFurnaceOnlySelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return state.desiredSystem.label.startsWith("Gas Furnace Only") || state.desiredSystem.label.startsWith("Oil Furnace Only");
+}
+
+
+function isFurnaceBasedSelection() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return state.desiredSystem.targetType === "Gas Furnace" || state.desiredSystem.targetType === "Oil Furnace";
+}
+
+function getRecommendedAndNextFurnaceOutputs(squareFeet) {
+  const recommendedRange = getRecommendedFurnaceOnlyRange(squareFeet);
+  if (!recommendedRange || recommendedRange.length === 0) {
+    return { recommended: null, next: null };
+  }
+
+  const recommended = recommendedRange[0];
+  const recommendedIndex = furnaceOnlyReference.findIndex((item) => item.output === recommended.output);
+  const next =
+    recommendedIndex >= 0 && recommendedIndex < furnaceOnlyReference.length - 1
+      ? furnaceOnlyReference[recommendedIndex + 1]
+      : null;
+
+  return { recommended, next };
+}
+
+function getRecommendedAndNextSizes(squareFeet) {
+  const recommendedRange = getRecommendedSystemRange(squareFeet);
+  if (!recommendedRange || recommendedRange.length === 0) {
+    return { recommended: null, next: null };
+  }
+
+  const recommended = recommendedRange[0];
+  const recommendedIndex = systemSizeReference.findIndex((item) => item.ton === recommended.ton);
+  const next =
+    recommendedIndex >= 0 && recommendedIndex < systemSizeReference.length - 1
+      ? systemSizeReference[recommendedIndex + 1]
+      : null;
+
+  return { recommended, next };
+}
+
+function getSelectedSystemViewLabel() {
+  if (!state.desiredSystem) {
+    return "Systems";
+  }
+
+  if (state.desiredSystem.targetType === "Heat Pump") {
+    return "Heat Pumps";
+  }
+
+  if (state.desiredSystem.targetType === "Gas Furnace") {
+    return "Gas Furnaces";
+  }
+
+  if (state.desiredSystem.targetType === "Oil Furnace") {
+    return "Oil Furnaces";
+  }
+
+  if (state.desiredSystem.targetType === "Fan Coil") {
+    return "Fan Coils";
+  }
+
+  return "Systems";
+}
+
+function getFurnaceOnlyPackageBaseLabel() {
+  if (!state.desiredSystem) {
+    return "Furnace Only Package Options";
+  }
+
+  if (state.conversionPageTitle && state.desiredSystem.targetType === "Oil Furnace") {
+    return "Oil Furnace Conversion Package Options";
+  }
+
+  if (state.conversionPageTitle && state.desiredSystem.targetType === "Gas Furnace") {
+    return "Gas Furnace Conversion Package Options";
+  }
+
+  if (state.desiredSystem.targetType === "Oil Furnace") {
+    return "Oil Furnace Only Package Options";
+  }
+
+  if (state.gasEfficiency === "standard_to_high_upgrade") {
+    return "High Efficiency Gas Furnace Upgrade Package Options";
+  }
+
+  if (state.gasEfficiency === "high") {
+    return "High Efficiency Gas Furnace Only Package Options";
+  }
+
+  if (state.gasEfficiency === "standard") {
+    return "Standard Efficiency Gas Furnace Only Package Options";
+  }
+
+  return "Gas Furnace Only Package Options";
+}
+
+function getPackagePageTitle(packageType) {
+  if (packageType === "combo") {
+    return "Matching A/C and Furnace Install Options";
+  }
+
+  if (packageType === "ac-only") {
+    return "Matching A/C Only Install Package Options";
+  }
+
+  if (packageType === "heat-pump") {
+    return "Matching Heat Pump Package Options";
+  }
+
+  return `Matching ${getFurnaceOnlyPackageBaseLabel()}`;
+}
+
+function renderPackageOptionsPage(packageType) {
+  clearWizard();
+  const packageTitle = getPackagePageTitle(packageType);
+  const sizeSummary = [];
+
+  if (state.currentKnownCoolingSize) {
+    sizeSummary.push(state.currentKnownCoolingSize);
+  }
+
+  if (state.currentKnownFurnaceSize) {
+    sizeSummary.push(state.currentKnownFurnaceSize);
+  }
+
+  wizard.innerHTML = `
+    <h2 class="panel-title panel-title--centered">${packageTitle}</h2>
+    <p class="panel-subtitle panel-subtitle--centered">
+      GOOD · BETTER · BEST quote page for this package type.
+    </p>
+    <p class="panel-subtitle">
+      Current system: <strong>${state.currentSystem || "Not provided"}</strong><br />
+      Desired system: <strong>${state.desiredSystem ? state.desiredSystem.label.replace(" (Using Your Existing Ductwork)", "") : "Not provided"}</strong><br />
+      ${sizeSummary.length ? `Matched size reference: <strong>${sizeSummary.join(" + ")}</strong>` : "Sizing will be confirmed during your verification visit."}
+    </p>
+    <div class="option-row">
+      <button class="primary-btn glowing-btn" type="button" data-role="contact-button">Continue to Contact Us</button>
+      <button class="secondary-btn" type="button" data-role="back-button">Back to Recommendations</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="contact-button"]').addEventListener("click", renderContactPage);
+  wizard.querySelector('[data-role="back-button"]').addEventListener("click", renderFinalStep);
+}
+
+function buildSizingMarkup() {
+  const recommendedSystems = state.homeSquareFeet ? getRecommendedSystemRange(state.homeSquareFeet) : [];
+  const recommendedFurnaceOnly = state.homeSquareFeet ? getRecommendedFurnaceOnlyRange(state.homeSquareFeet) : [];
+  const { recommended, next } = getRecommendedAndNextSizes(state.homeSquareFeet);
+  const { recommended: recommendedFurnaceOutput, next: nextFurnaceOutput } = getRecommendedAndNextFurnaceOutputs(
+    state.homeSquareFeet,
+  );
+  const selectedLabel = getSelectedSystemViewLabel();
+
+  if (recommendedSystems.length === 0 && !state.currentKnownCoolingSize && !state.currentKnownFurnaceSize) {
+    return "";
+  }
+
+  const systemRows = state.currentKnownCoolingSize
+    ? `<li><strong>${state.currentKnownCoolingSize}</strong> (customer provided current cooling size)</li>`
+    : recommendedSystems
+        .map((item) => {
+          const baseLine = `<strong>${item.ton}</strong> (${item.coolingBTU}) · Typical home: ${item.homeMin}–${item.homeMax} sq ft`;
+          const includeFurnaceRange = !isHeatPumpSelection();
+          return `<li>${baseLine}${includeFurnaceRange ? ` · Typical furnace range: ${item.furnaceRange}` : ""}</li>`;
+        })
+        .join("");
+
+  const furnaceRows = state.currentKnownFurnaceSize
+    ? `<li><strong>${state.currentKnownFurnaceSize}</strong> (customer provided current furnace size)</li>`
+    : (recommendedFurnaceOnly || [])
+        .map((item) => `<li><strong>${item.output}</strong> · Typical home: ${item.homeMin}–${item.homeMax} sq ft</li>`)
+        .join("");
+
+  const furnaceSection = isFurnaceOnlySelection()
+    ? `
+      <h3 class="sizing-title">Furnace-Only Heating Reference</h3>
+      <ul class="sizing-list">${furnaceRows}</ul>
+    `
+    : "";
+
+  const viewButtonsMarkup = (() => {
+    if (!state.desiredSystem) {
+      return "";
+    }
+
+    if (isFurnaceBasedSelection()) {
+      if (state.currentKnownFurnaceSize) {
+        return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${state.currentKnownFurnaceSize} ${selectedLabel}</button>
+      </div>
+    `;
+      }
+
+      if (recommendedFurnaceOutput) {
+        return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${recommendedFurnaceOutput.output} ${selectedLabel}</button>
+        ${nextFurnaceOutput ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${nextFurnaceOutput.output} ${selectedLabel}</button>` : ""}
+      </div>
+    `;
+      }
+    }
+
+    if (isSplitACAndFurnaceSelection()) {
+      return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-package-options" data-package-type="combo">View Matching A/C and Furnace Install Options</button>
+        <button type="button" class="secondary-btn glowing-btn" data-role="view-package-options" data-package-type="ac-only">View Matching A/C Only Install Package Options</button>
+        <button type="button" class="secondary-btn glowing-btn" data-role="view-package-options" data-package-type="heat-pump">View Matching Heat Pump Package Options</button>
+        <button type="button" class="secondary-btn glowing-btn" data-role="view-package-options" data-package-type="furnace-only">View Matching ${getFurnaceOnlyPackageBaseLabel()}</button>
+      </div>
+    `;
+    }
+
+    if (state.currentKnownCoolingSize) {
+      return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${state.currentKnownCoolingSize} ${selectedLabel}</button>
+      </div>
+    `;
+    }
+
+    if (recommended) {
+      return `
+      <div class="option-row sizing-actions">
+        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${recommended.ton} ${selectedLabel}</button>
+        ${next ? `<button type="button" class="secondary-btn glowing-btn" data-role="view-next-size">View ${next.ton} ${selectedLabel}</button>` : ""}
+      </div>
+    `;
+    }
+
+    return "";
+  })();
+
+  return `
+    <section class="sizing-panel">
+      <h3 class="sizing-title">Estimated System Size Range</h3>
+      <p class="panel-subtitle">${state.homeSquareFeet ? `Based on ${state.homeSquareFeet} sq ft and typical local residential assumptions (average insulation, 8–9 ft ceilings).` : "Based on system size information you provided."}</p>
+      <ul class="sizing-list">${systemRows}</ul>
+      ${viewButtonsMarkup}
+      ${furnaceSection}
+      <p class="panel-subtitle"><strong>Sizing & Pricing Disclaimer:</strong> The system sizes and pricing shown here are based on the square footage information you provided and typical sizing guidelines for homes in our area. Once you’ve selected the system you’d like, you can schedule your free verification and sizing appointment online with The Heating and Cooling Guys. During this visit, we’ll confirm the equipment selection and installation details. As long as no additional issues or installation requirements are discovered, the pricing shown here will remain accurate. If any adjustments are needed, we’ll review them with you before moving forward.</p>
+    </section>
+  `;
+}
+
+function renderFinalStep() {
+  clearWizard();
+  const template = document.getElementById("final-template").content.cloneNode(true);
+  const summary = [];
+
+  if (state.desiredSystem) {
+    summary.push(`You selected: ${state.desiredSystem.label}.`);
+  }
+
+  if (state.currentSystem) {
+    summary.push(`Current system: ${state.currentSystem}.`);
+  }
+
+  if (state.homeSquareFeet) {
+    summary.push(`Home size: ${state.homeSquareFeet} sq ft.`);
+  }
+
+  if (state.currentKnownCoolingSize) {
+    summary.push(`Known current A/C size: ${state.currentKnownCoolingSize}.`);
+  }
+
+  if (state.currentKnownFurnaceSize) {
+    summary.push(`Known current furnace size: ${state.currentKnownFurnaceSize}.`);
+  }
+
+  if (state.systemLocation === "split_attic") {
+    summary.push("System location: Outdoor unit and indoor unit in attic.");
+  } else if (state.systemLocation === "split_basement") {
+    summary.push("System location: Outdoor unit and indoor unit in basement.");
+  } else if (state.systemLocation === "furnace_attic") {
+    summary.push("System location: Furnace unit in attic.");
+  } else if (state.systemLocation === "furnace_basement") {
+    summary.push("System location: Furnace unit in basement.");
+  }
+
+  if (state.gasEfficiency === "standard") {
+    summary.push("Gas furnace efficiency noted: Standard.");
+  } else if (state.gasEfficiency === "high") {
+    summary.push("Gas furnace efficiency noted: High.");
+  } else if (state.gasEfficiency === "standard_to_high_upgrade") {
+    summary.push("Requested path: Standard gas furnace to high-efficiency upgrade.");
+  }
+
+  if (state.conversionPageTitle) {
+    summary.push(`Conversion path: ${state.conversionPageTitle.replace(" Page", "")}.`);
+  }
+
+  template.querySelector('[data-role="summary"]').textContent = summary.join(" ");
+  template.querySelector('[data-role="contact-button"]').addEventListener("click", renderContactPage);
+  template.querySelector('[data-role="restart-button"]').addEventListener("click", renderStart);
+  wizard.appendChild(template);
+
+  const sizingMarkup = buildSizingMarkup();
+  if (sizingMarkup) {
+    wizard.insertAdjacentHTML("beforeend", sizingMarkup);
+
+    wizard.querySelectorAll('[data-role="view-package-options"]').forEach((button) => {
+      button.addEventListener("click", () => {
+        renderPackageOptionsPage(button.getAttribute("data-package-type"));
+      });
+    });
+
+    const recommendedBtn = wizard.querySelector('[data-role="view-recommended-size"]');
+    if (recommendedBtn) {
+      recommendedBtn.addEventListener("click", renderContactPage);
+    }
+
+    const nextBtn = wizard.querySelector('[data-role="view-next-size"]');
+    if (nextBtn) {
+      nextBtn.addEventListener("click", renderContactPage);
+    }
+  }
+}
+
+function renderContactPage() {
+  clearWizard();
+  const template = document.getElementById("contact-template").content.cloneNode(true);
+  const form = template.querySelector('[data-role="contact-form"]');
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const message = document.createElement("p");
+    message.className = "form-message";
+    message.textContent = "Thank you! A comfort specialist will contact you shortly.";
+    form.replaceWith(message);
+  });
+
+  template.querySelector('[data-role="restart-button"]').addEventListener("click", renderStart);
+  wizard.appendChild(template);
+}
+
+renderStart();
