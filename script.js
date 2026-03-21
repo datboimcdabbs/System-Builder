@@ -19,7 +19,7 @@ const systemsWithDuctwork = [
     fuelType: "oil",
     targetType: "Oil Furnace",
   },
-  { label: "A/C and Fan Coil", image: "assets/ac-fan-coil.svg", fuelType: "electric", targetType: "Fan Coil" },
+  { label: "A/C and Fan Coil", image: "https://lh3.googleusercontent.com/p/AF1QipOYI5hRFCWUihGVLl3PvdRIYCreBIcUfdAle7iY=s680-w680-h510-rw", fuelType: "electric", targetType: "Fan Coil" },
   { label: "Oil Furnace Only", image: "assets/oil-furnace-only.svg", fuelType: "oil", targetType: "Oil Furnace" },
   { label: "Gas Furnace Only", image: "assets/gas-furnace-only.svg", fuelType: "gas", targetType: "Gas Furnace" },
 ];
