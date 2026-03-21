@@ -120,6 +120,32 @@ function clearWizard() {
   wizard.innerHTML = "";
 }
 
+function getOptimizedThumbnailUrl(url) {
+  if (!url || url.startsWith("assets/")) {
+    return url;
+  }
+
+  if (url.includes("googleusercontent.com") && url.includes("=")) {
+    return url.replace(/=s\d+[^"]*$/, "=s480");
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.hostname === "1drv.ms") {
+      parsedUrl.searchParams.set("width", "480");
+      if (parsedUrl.searchParams.has("height")) {
+        parsedUrl.searchParams.set("height", "640");
+      }
+      return parsedUrl.toString();
+    }
+  } catch {
+    return url;
+  }
+
+  return url;
+}
+
 function createThumbnailCard(option, highlightMatcher) {
   const card = document.createElement("button");
   card.type = "button";
@@ -133,8 +159,11 @@ function createThumbnailCard(option, highlightMatcher) {
   }
 
   const img = document.createElement("img");
-  img.src = option.image;
+  img.src = getOptimizedThumbnailUrl(option.image);
   img.alt = option.label;
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.fetchPriority = "low";
 
   const text = document.createElement("span");
   text.textContent = option.label;
