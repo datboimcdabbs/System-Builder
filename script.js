@@ -15,11 +15,11 @@ const systemsWithDuctwork = [
   },
   {
     label: "A/C and Oil Furnace",
-    image: "assets/ac-oil-furnace.svg",
+    image: "https://1drv.ms/i/c/b0a9e4f44f1af7a3/IQRSUDXcz1cSTqjHdm3G0os3ATAj-5dX6uZo6WKT0B3G55M?width=591&height=1280",
     fuelType: "oil",
     targetType: "Oil Furnace",
   },
-  { label: "A/C and Fan Coil", image: "https://lh3.googleusercontent.com/p/AF1QipOYI5hRFCWUihGVLl3PvdRIYCreBIcUfdAle7iY=s680-w680-h510-rw", fuelType: "electric", targetType: "Fan Coil" },
+  { label: "A/C Only", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQT026GdGMMDQa_aeFR_KppNAQmlTFKq-aIWjywqSLnZHXA?height=1024", fuelType: "electric", targetType: "Fan Coil" },
   { label: "Oil Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipPzRhfEv4pEkj0TGFHQElJNpEzbDFDLMrr6lCI-=s680-w680-h510-rw", fuelType: "oil", targetType: "Oil Furnace" },
   { label: "Gas Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipMlZNC6hgmIyl9yPnI05gesLa-8vwJ9B0ST2xdD=s680-w680-h510-rw", fuelType: "gas", targetType: "Gas Furnace" },
   { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw", fuelType: null, targetType: null },
@@ -28,8 +28,8 @@ const systemsWithDuctwork = [
 const systemsWithoutDuctwork = [
   { label: "I don’t have any system in my home, but I want one!", image: "assets/no-system.svg" },
   { label: "Oil Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipPOs0ffGzVhvvFpvMsyUewr99c_klsq3nrqrxl9=s680-w680-h510-rw" },
-  { label: "Gas Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipN7oPZ-9P52te-Uu-k4AYd0X_IYtUyl4C9Kyvdj=s680-w680-h510-rw" },
-  { label: "Gas Combi-Boiler/Tankless Water Heater", image: "assets/combi-boiler.svg" },
+  { label: "Gas Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipNKnN2tuCcTNGrpIqBaQWEba9LSU0P_xeydjsfc=s680-w680-h510-rw" },
+  { label: "Gas Combi-Boiler/Tankless Water Heater", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRyguDZsTHhTJGBdlRt56fJAc0rNzjamVKXbPWHKjQ252U?height=1024" },
   { label: "Mini Split (Indoor and Outdoor Units)", image: "assets/mini-split.svg" },
   { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw" },
 ];
