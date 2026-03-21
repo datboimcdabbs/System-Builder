@@ -187,7 +187,29 @@ textarea {
 }
 
 .thumbnail-grid--duct-condition {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.thumbnail-grid--duct-condition .thumbnail-card {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.thumbnail-grid--duct-condition .thumbnail-card img {
+  height: 260px;
+}
+
+@media (max-width: 900px) {
+  .thumbnail-grid--duct-condition {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .thumbnail-grid--duct-condition {
+    grid-template-columns: 1fr;
+  }
 }
 
 
