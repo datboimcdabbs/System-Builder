@@ -1,8 +1,8 @@
 const wizard = document.getElementById("wizard");
 
 const ductworkPresenceOptions = [
-  { label: "Yes", image: "https://www.novakheating.com/wp-content/webp-express/webp-images/uploads/2022/09/Novak_Ducts-vs.-Vents-1.png.webp", value: true },
-  { label: "No", image: "https://fredelectric.com/wp-content/uploads/2026/01/Baseboard-Heaters-to-Heat-Pump-Blog-1024x576.png", value: false },
+  { label: "Ductwork and Vents", image: "https://www.novakheating.com/wp-content/webp-express/webp-images/uploads/2022/09/Novak_Ducts-vs.-Vents-1.png.webp", value: true },
+  { label: "Mini-Split(s), Hot Water Baseboards or Something else...", image: "https://fredelectric.com/wp-content/uploads/2026/01/Baseboard-Heaters-to-Heat-Pump-Blog-1024x576.png", value: false },
 ];
 
 const systemsWithDuctwork = [
@@ -204,8 +204,8 @@ function renderStart() {
   resetDuctedPathState();
 
   renderThumbnailQuestion({
-    title: "Does your Heating/Cooling system use Ductwork and registers to keep your air comfortable?",
-    subtitle: "Choose the option that best matches your home.",
+    title: "How does your home currently deliver heating and cooling?",
+    subtitle: "Select the option below that best matches your home today.",
     options: ductworkPresenceOptions.map((option) => ({
       ...option,
       onClick: () => {
