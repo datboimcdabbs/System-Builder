@@ -6,10 +6,10 @@ const ductworkPresenceOptions = [
 ];
 
 const systemsWithDuctwork = [
-  { label: "Heat Pump System", image: "assets/heat-pump.svg", fuelType: "electric", targetType: "Heat Pump" },
+  { label: "Heat Pump System", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQSQVaAi1KD0RqvHwzI8ARdHAQ8pNVns0j5Fu9GVoYojsBY?height=660", fuelType: "electric", targetType: "Heat Pump" },
   {
     label: "A/C and Gas Furnace",
-    image: "https://lh3.googleusercontent.com/p/AF1QipOTiePLIdzQiFnCV6ynqrujwBkOOPsoRgf7NXo9=s680-w680-h510-rw",
+    image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQSkACZIRk8WTJGUFR2dOUPNAW5DsAXlSnrOV7QJanWRmx4?height=660",
     fuelType: "gas",
     targetType: "Gas Furnace",
   },
@@ -26,11 +26,11 @@ const systemsWithDuctwork = [
 ];
 
 const systemsWithoutDuctwork = [
-  { label: "I don’t have any system in my home, but I want one!", image: "assets/no-system.svg" },
+  { label: "I don’t have any system in my home, but I want one!", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRpFrndNecEQ6j4o-v1uAxFAeLp3iW33iQGEwsSMBanxuQ?width=1024" },
   { label: "Oil Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipPOs0ffGzVhvvFpvMsyUewr99c_klsq3nrqrxl9=s680-w680-h510-rw" },
   { label: "Gas Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipNKnN2tuCcTNGrpIqBaQWEba9LSU0P_xeydjsfc=s680-w680-h510-rw" },
   { label: "Gas Combi-Boiler/Tankless Water Heater", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRyguDZsTHhTJGBdlRt56fJAc0rNzjamVKXbPWHKjQ252U?height=1024" },
-  { label: "Mini Split (Indoor and Outdoor Units)", image: "assets/mini-split.svg" },
+  { label: "Mini Split (Indoor and Outdoor Units)", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRlIT27mRkOQafb0QkNP5ETAaO8dmR4wdaDDtkURxTzIcY?width=1024" },
   { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw" },
 ];
 
@@ -42,14 +42,14 @@ const ductConditionOptions = [
   },
   {
     label: "I think it is good, but I want to make sure first.",
-    image: "assets/duct-condition-check.svg",
+    image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQQh5lUmY_2eSYImDb8O7GMIAcpMjSvW26CWj2R_QykSC3Y?width=660",
     expandableCopy:
       "We always confirm the ductwork during your free Pre-Install Verification appointment, to make sure that your existing ducts can provide the best comfort with your new system!",
     onSelect: () => renderDesiredDuctedSystem(),
   },
   {
     label: "I believe that some or all of my ductwork may need to be replaced.",
-    image: "assets/duct-condition-replace.svg",
+    image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQQspNbDElZVQK8st5E93Qk2ATbl_XA1HmU5N_GXszsiFLk?width=660",
     onSelect: () => renderContactPage(),
   },
 ];
