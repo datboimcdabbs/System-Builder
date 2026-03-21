@@ -22,7 +22,7 @@ const systemsWithDuctwork = [
   },
   { label: "A/C Only", image: "https://static.wixstatic.com/media/f2f928_1ecf3d68edbe4deba7da9da7fcb7d411~mv2.jpg", fuelType: "electric", targetType: "Fan Coil" },
   { label: "Oil Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipPzRhfEv4pEkj0TGFHQElJNpEzbDFDLMrr6lCI-=s680-w680-h510-rw", fuelType: "oil", targetType: "Oil Furnace" },
-  { label: "Gas Furnace Only", image: "https://static.wixstatic.com/media/f2f928_3eb31471ad93436fbc41fe89461ea2c1~mv2.png", fuelType: "gas", targetType: "Gas Furnace" },
+  { label: "Gas Furnace Only", image: "https://static.wixstatic.com/media/f2f928_f9f434dd801a4b9bb392adde03a43429~mv2.png", fuelType: "gas", targetType: "Gas Furnace" },
   { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw", fuelType: null, targetType: null },
 ];
 
@@ -178,11 +178,19 @@ function createThumbnailCard(option, highlightMatcher) {
   return card;
 }
 
-function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMatcher, cardClass }) {
+function renderThumbnailQuestion({ title, subtitle, options, onBack, highlightMatcher, cardClass, centeredHeading = false }) {
   clearWizard();
   const template = document.getElementById("thumbnail-question-template").content.cloneNode(true);
-  template.querySelector(".panel-title").textContent = title;
-  template.querySelector(".panel-subtitle").textContent = subtitle || "";
+  const titleElement = template.querySelector(".panel-title");
+  const subtitleElement = template.querySelector(".panel-subtitle");
+  titleElement.textContent = title;
+  subtitleElement.textContent = subtitle || "";
+
+  if (centeredHeading) {
+    titleElement.classList.add("panel-title--centered");
+    subtitleElement.classList.add("panel-subtitle--centered");
+  }
+
   const grid = template.querySelector('[data-role="thumbnail-options"]');
 
   if (cardClass) {
@@ -429,9 +437,10 @@ function renderOtherDesiredDuctedSystems() {
       .map((option) => ({
         ...option,
         onClick: () => selectDesiredDuctedSystem(option),
-      })),
+    })),
     onBack: renderDesiredDuctedSystem,
     cardClass: "thumbnail-grid--portrait-systems",
+    centeredHeading: true,
   });
 }
 
@@ -441,11 +450,11 @@ function renderDesiredDuctedSystem() {
   if (directReplacementOption && state.currentSystem !== "Not Sure") {
     clearWizard();
     const title = document.createElement("h2");
-    title.className = "panel-title";
+    title.className = "panel-title panel-title--centered";
     title.textContent = "What type of system are you looking to get installed?";
 
     const subtitle = document.createElement("p");
-    subtitle.className = "panel-subtitle";
+    subtitle.className = "panel-subtitle panel-subtitle--centered";
     subtitle.textContent =
       "Most homeowners replace their system with a like-for-like option. Choose the direct replacement below, or select the button underneath to see all other options.";
 
@@ -492,6 +501,7 @@ function renderDesiredDuctedSystem() {
     onBack: renderDuctCondition,
     highlightMatcher: (option) => isDirectReplacement(option),
     cardClass: "thumbnail-grid--portrait-systems",
+    centeredHeading: true,
   });
 }
 
@@ -890,6 +900,87 @@ function getSelectedSystemViewLabel() {
   return "Systems";
 }
 
+function getFurnaceOnlyPackageBaseLabel() {
+  if (!state.desiredSystem) {
+    return "Furnace Only Package Options";
+  }
+
+  if (state.conversionPageTitle && state.desiredSystem.targetType === "Oil Furnace") {
+    return "Oil Furnace Conversion Package Options";
+  }
+
+  if (state.conversionPageTitle && state.desiredSystem.targetType === "Gas Furnace") {
+    return "Gas Furnace Conversion Package Options";
+  }
+
+  if (state.desiredSystem.targetType === "Oil Furnace") {
+    return "Oil Furnace Only Package Options";
+  }
+
+  if (state.gasEfficiency === "standard_to_high_upgrade") {
+    return "High Efficiency Gas Furnace Upgrade Package Options";
+  }
+
+  if (state.gasEfficiency === "high") {
+    return "High Efficiency Gas Furnace Only Package Options";
+  }
+
+  if (state.gasEfficiency === "standard") {
+    return "Standard Efficiency Gas Furnace Only Package Options";
+  }
+
+  return "Gas Furnace Only Package Options";
+}
+
+function getPackagePageTitle(packageType) {
+  if (packageType === "combo") {
+    return "Matching A/C and Furnace Install Options";
+  }
+
+  if (packageType === "ac-only") {
+    return "Matching A/C Only Install Package Options";
+  }
+
+  if (packageType === "heat-pump") {
+    return "Matching Heat Pump Package Options";
+  }
+
+  return `Matching ${getFurnaceOnlyPackageBaseLabel()}`;
+}
+
+function renderPackageOptionsPage(packageType) {
+  clearWizard();
+  const packageTitle = getPackagePageTitle(packageType);
+  const sizeSummary = [];
+
+  if (state.currentKnownCoolingSize) {
+    sizeSummary.push(state.currentKnownCoolingSize);
+  }
+
+  if (state.currentKnownFurnaceSize) {
+    sizeSummary.push(state.currentKnownFurnaceSize);
+  }
+
+  wizard.innerHTML = `
+    <h2 class="panel-title panel-title--centered">${packageTitle}</h2>
+    <p class="panel-subtitle panel-subtitle--centered">
+      GOOD · BETTER · BEST quote page for this package type.
+    </p>
+    <p class="panel-subtitle">
+      Current system: <strong>${state.currentSystem || "Not provided"}</strong><br />
+      Desired system: <strong>${state.desiredSystem ? state.desiredSystem.label.replace(" (Using Your Existing Ductwork)", "") : "Not provided"}</strong><br />
+      ${sizeSummary.length ? `Matched size reference: <strong>${sizeSummary.join(" + ")}</strong>` : "Sizing will be confirmed during your verification visit."}
+    </p>
+    <div class="option-row">
+      <button class="primary-btn glowing-btn" type="button" data-role="contact-button">Continue to Contact Us</button>
+      <button class="secondary-btn" type="button" data-role="back-button">Back to Recommendations</button>
+    </div>
+  `;
+
+  wizard.querySelector('[data-role="contact-button"]').addEventListener("click", renderContactPage);
+  wizard.querySelector('[data-role="back-button"]').addEventListener("click", renderFinalStep);
+}
+
 function buildSizingMarkup() {
   const recommendedSystems = state.homeSquareFeet ? getRecommendedSystemRange(state.homeSquareFeet) : [];
   const recommendedFurnaceOnly = state.homeSquareFeet ? getRecommendedFurnaceOnlyRange(state.homeSquareFeet) : [];
@@ -951,45 +1042,14 @@ function buildSizingMarkup() {
     }
 
     if (isSplitACAndFurnaceSelection()) {
-      if (state.currentKnownCoolingSize && state.currentKnownFurnaceSize) {
-        return `
+      return `
       <div class="option-row sizing-actions">
-        <button type="button" class="primary-btn glowing-btn" data-role="view-recommended-size">View ${state.currentKnownCoolingSize} A/C + ${state.currentKnownFurnaceSize} Furnace</button>
+        <button type="button" class="primary-btn glowing-btn" data-role="view-package-options" data-package-type="combo">View Matching A/C and Furnace Install Options</button>
+        <button type="button" class="secondary-btn glowing-btn" data-role="view-package-options" data-package-type="ac-only">View Matching A/C Only Install Package Options</button>
+        <button type="button" class="secondary-btn glowing-btn" data-role="view-package-options" data-package-type="heat-pump">View Matching Heat Pump Package Options</button>
+        <button type="button" class="secondary-btn glowing-btn" data-role="view-package-options" data-package-type="furnace-only">View Matching ${getFurnaceOnlyPackageBaseLabel()}</button>
       </div>
     `;
-      }
-
-      const coolingCandidates = state.currentKnownCoolingSize
-        ? [state.currentKnownCoolingSize]
-        : recommendedSystems.map((item) => item.ton);
-      const furnaceCandidates = state.currentKnownFurnaceSize
-        ? [state.currentKnownFurnaceSize]
-        : recommendedFurnaceOnly.map((item) => item.output);
-
-      const comboCount = Math.max(coolingCandidates.length, furnaceCandidates.length);
-      const combos = [];
-      for (let index = 0; index < comboCount; index += 1) {
-        const cooling = coolingCandidates[index] || coolingCandidates[coolingCandidates.length - 1];
-        const furnace = furnaceCandidates[index] || furnaceCandidates[furnaceCandidates.length - 1];
-        if (cooling && furnace) {
-          combos.push(`${cooling} A/C + ${furnace} Furnace`);
-        }
-      }
-
-      if (combos.length > 0) {
-        return `
-      <div class="option-row sizing-actions">
-        ${combos
-          .map(
-            (label, index) =>
-              `<button type="button" class="${index === 0 ? "primary-btn" : "secondary-btn"} glowing-btn" data-role="${index === 0 ? "view-recommended-size" : "view-next-size"}">View ${label}</button>`,
-          )
-          .join("")}
-      </div>
-    `;
-      }
-
-      return "";
     }
 
     if (state.currentKnownCoolingSize) {
@@ -1079,6 +1139,12 @@ function renderFinalStep() {
   const sizingMarkup = buildSizingMarkup();
   if (sizingMarkup) {
     wizard.insertAdjacentHTML("beforeend", sizingMarkup);
+
+    wizard.querySelectorAll('[data-role="view-package-options"]').forEach((button) => {
+      button.addEventListener("click", () => {
+        renderPackageOptionsPage(button.getAttribute("data-package-type"));
+      });
+    });
 
     const recommendedBtn = wizard.querySelector('[data-role="view-recommended-size"]');
     if (recommendedBtn) {
