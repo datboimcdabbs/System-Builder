@@ -3,61 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quote 3/21/2026 | 2.0 Ton Heat Pumps</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <title>View 2.0 Ton Heat Pumps</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">System Builder • Quote Detail</p>
-          <h1>2.0 Ton Heat Pump Options</h1>
-          <p class="hero-copy">
-            This page turns the saved quote into a clean product-comparison experience when a
-            customer clicks <strong>“View 2.0 ton heat pumps”</strong>.
-          </p>
-        </div>
-        <div class="hero-meta" id="quote-meta"></div>
-      </header>
-
-      <main class="layout">
-        <section>
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">Available systems</p>
-              <h2>Choose a proposal to review</h2>
-            </div>
-            <span class="pill" id="selection-pill">Selected: Foundation</span>
-          </div>
-          <div class="proposal-grid" id="proposal-grid"></div>
-        </section>
-
-        <section class="details-panel" id="details-panel" aria-live="polite"></section>
-      </main>
-    </div>
-
-    <template id="proposal-card-template">
-      <button class="proposal-card" type="button">
-        <div class="proposal-card__image-wrap">
-          <img class="proposal-card__image" alt="" />
-        </div>
-        <div class="proposal-card__content">
-          <div class="proposal-card__title-row">
-            <h3 class="proposal-card__title"></h3>
-            <span class="proposal-card__price"></span>
-          </div>
-          <p class="proposal-card__description"></p>
-          <div class="badge-row"></div>
-          <div class="metrics"></div>
-        </div>
-      </button>
-    </template>
+    <main class="page-shell">
+      <section class="json-page" aria-labelledby="page-title">
+        <h1 id="page-title">View 2.0 ton heat pumps</h1>
+        <p class="page-copy">
+          Showing the saved quote payload exactly as provided, without reformatting or content changes.
+        </p>
+        <pre class="json-block"><code id="quote-json"></code></pre>
+      </section>
+    </main>
 
     <script src="quote-data.js"></script>
     <script src="app.js"></script>
