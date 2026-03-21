@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2.0 Ton Heat Pump Quote</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">System Builder</p>
+        <h1>View 2.0 Ton Heat Pumps</h1>
+        <p class="hero-copy">
+          A customer-friendly quote page that opens directly into the 2.0 ton heat pump options,
+          highlights the selected package, and makes it easy to compare performance, rebates, and
+          included features.
+        </p>
+        <div class="quote-meta">
+          <span id="quote-name">Quote</span>
+          <span id="payment-type">Cash</span>
+        </div>
+      </section>
+
+      <section class="proposal-layout">
+        <aside class="proposal-nav" aria-label="Heat pump options">
+          <div class="proposal-nav__header">
+            <h2>Available systems</h2>
+            <p>Select a package to preview the full sales page.</p>
+          </div>
+          <div id="proposal-tabs" class="proposal-tabs"></div>
+        </aside>
+
+        <article class="proposal-card" aria-live="polite">
+          <div class="proposal-card__media">
+            <img id="proposal-image" alt="Selected heat pump system" />
+          </div>
+
+          <div class="proposal-card__content">
+            <div class="proposal-card__intro">
+              <div>
+                <p class="proposal-card__label">Recommended package</p>
+                <h2 id="proposal-title"></h2>
+              </div>
+              <div class="price-block">
+                <span class="price-block__label">System subtotal</span>
+                <strong id="proposal-price"></strong>
+              </div>
+            </div>
+
+            <p id="proposal-description" class="proposal-description"></p>
+
+            <div class="badge-row" id="badge-row"></div>
+
+            <section class="stats-grid" aria-label="Efficiency ratings">
+              <div class="stat-card">
+                <span class="stat-card__label">SEER2</span>
+                <strong id="seer2"></strong>
+                <p id="seer2-summary"></p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-card__label">EER2</span>
+                <strong id="eer2"></strong>
+                <p id="eer2-summary"></p>
+              </div>
+              <div class="stat-card">
+                <span class="stat-card__label">HSPF2</span>
+                <strong id="hspf2"></strong>
+                <p id="hspf2-summary"></p>
+              </div>
+            </section>
+
+            <section class="details-grid">
+              <div class="detail-panel">
+                <h3>Equipment details</h3>
+                <dl>
+                  <div>
+                    <dt id="outdoor-label">Outdoor unit</dt>
+                    <dd id="outdoor"></dd>
+                  </div>
+                  <div>
+                    <dt id="indoor-label">Indoor unit</dt>
+                    <dd id="indoor"></dd>
+                  </div>
+                  <div>
+                    <dt>AHRI reference</dt>
+                    <dd><a id="ahri-link" target="_blank" rel="noreferrer noopener"></a></dd>
+                  </div>
+                  <div>
+                    <dt>Rebate</dt>
+                    <dd id="rebate"></dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div class="detail-panel detail-panel--accent">
+                <h3>Selections included</h3>
+                <ul id="selection-summary" class="selection-list"></ul>
+              </div>
+            </section>
+
+            <section class="features-grid">
+              <div class="feature-panel">
+                <h3>Outdoor features</h3>
+                <p id="outdoor-feature-description" class="feature-description"></p>
+                <ul id="outdoor-features"></ul>
+              </div>
+              <div class="feature-panel">
+                <h3>Indoor features</h3>
+                <p id="indoor-feature-description" class="feature-description"></p>
+                <ul id="indoor-features"></ul>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
