@@ -6,50 +6,50 @@ const ductworkPresenceOptions = [
 ];
 
 const systemsWithDuctwork = [
-  { label: "Heat Pump System", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQSQVaAi1KD0RqvHwzI8ARdHAQ8pNVns0j5Fu9GVoYojsBY?height=660", fuelType: "electric", targetType: "Heat Pump" },
+  { label: "Heat Pump System", image: "https://static.wixstatic.com/media/f2f928_4bcc05fad65f4c83a96be046c5173a6f~mv2.jpg", fuelType: "electric", targetType: "Heat Pump" },
   {
     label: "A/C and Gas Furnace",
-    image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQSkACZIRk8WTJGUFR2dOUPNAW5DsAXlSnrOV7QJanWRmx4?height=660",
+    image: "https://static.wixstatic.com/media/f2f928_e11c429615c446569bb29f60f571c195~mv2.jpeg",
     fuelType: "gas",
     targetType: "Gas Furnace",
   },
   {
     label: "A/C and Oil Furnace",
-    image: "https://1drv.ms/i/c/b0a9e4f44f1af7a3/IQRSUDXcz1cSTqjHdm3G0os3ATAj-5dX6uZo6WKT0B3G55M?width=591&height=1280",
+    image: "https://static.wixstatic.com/media/f2f928_7c6c03800e274a7dafe42cd972376f16~mv2.jpg",
     fuelType: "oil",
     targetType: "Oil Furnace",
   },
-  { label: "A/C Only", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQT026GdGMMDQa_aeFR_KppNAQmlTFKq-aIWjywqSLnZHXA?height=1024", fuelType: "electric", targetType: "Fan Coil" },
+  { label: "A/C Only", image: "https://static.wixstatic.com/media/f2f928_1ecf3d68edbe4deba7da9da7fcb7d411~mv2.jpg", fuelType: "electric", targetType: "Fan Coil" },
   { label: "Oil Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipPzRhfEv4pEkj0TGFHQElJNpEzbDFDLMrr6lCI-=s680-w680-h510-rw", fuelType: "oil", targetType: "Oil Furnace" },
-  { label: "Gas Furnace Only", image: "https://lh3.googleusercontent.com/p/AF1QipMlZNC6hgmIyl9yPnI05gesLa-8vwJ9B0ST2xdD=s680-w680-h510-rw", fuelType: "gas", targetType: "Gas Furnace" },
+  { label: "Gas Furnace Only", image: "https://static.wixstatic.com/media/f2f928_3eb31471ad93436fbc41fe89461ea2c1~mv2.png", fuelType: "gas", targetType: "Gas Furnace" },
   { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw", fuelType: null, targetType: null },
 ];
 
 const systemsWithoutDuctwork = [
-  { label: "I don’t have any system in my home, but I want one!", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRpFrndNecEQ6j4o-v1uAxFAeLp3iW33iQGEwsSMBanxuQ?width=1024" },
-  { label: "Oil Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipPOs0ffGzVhvvFpvMsyUewr99c_klsq3nrqrxl9=s680-w680-h510-rw" },
-  { label: "Gas Boiler", image: "https://lh3.googleusercontent.com/p/AF1QipNKnN2tuCcTNGrpIqBaQWEba9LSU0P_xeydjsfc=s680-w680-h510-rw" },
-  { label: "Gas Combi-Boiler/Tankless Water Heater", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRyguDZsTHhTJGBdlRt56fJAc0rNzjamVKXbPWHKjQ252U?height=1024" },
-  { label: "Mini Split (Indoor and Outdoor Units)", image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQRlIT27mRkOQafb0QkNP5ETAaO8dmR4wdaDDtkURxTzIcY?width=1024" },
-  { label: "Not Sure", image: "https://lh3.googleusercontent.com/p/AF1QipNXcr2s4YOnBa3tWZdsENCU3mo9-yd_uY7N7poE=s680-w680-h510-rw" },
+  { label: "I don’t have any system in my home, but I want one!", image: "https://static.wixstatic.com/media/f2f928_1ad05155e5e54bd3b86fed2c29f03f76~mv2.jpeg" },
+  { label: "Oil Boiler", image: "https://static.wixstatic.com/media/91d1a1_00b2b0a3361c4d7fb0215ce82fefc286~mv2.jpg" },
+  { label: "Gas Boiler", image: "https://static.wixstatic.com/media/f2f928_d38275ca84ea46d094dd5da270a6fab2~mv2.jpeg" },
+  { label: "Gas Combi-Boiler/Tankless Water Heater", image: "https://static.wixstatic.com/media/f2f928_c2ffd9f26a3b463a8d7aa78cbdea44e8~mv2.png" },
+  { label: "Mini Split (Indoor and Outdoor Units)", image: "https://static.wixstatic.com/media/f2f928_a915f5764e6547fbbc8b8ed877a7fb17~mv2.jpg" },
+  { label: "Not Sure", image: "https://static.wixstatic.com/media/f2f928_91b81ad5a02844fb8e6e531e2c5ab02e~mv2.jpeg" },
 ];
 
 const ductConditionOptions = [
   {
     label: "Yes, I believe my ductwork is in usable condition.",
-    image: "assets/duct-condition-good.svg",
+    image: "https://static.wixstatic.com/media/f2f928_1ecf3d68edbe4deba7da9da7fcb7d411~mv2.jpg",
     onSelect: () => renderDesiredDuctedSystem(),
   },
   {
-    label: "I think it is good, but I want to make sure first.",
-    image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQQh5lUmY_2eSYImDb8O7GMIAcpMjSvW26CWj2R_QykSC3Y?width=660",
+    label: "It may need some small improvements or minor leak sealing",
+    image: "https://static.wixstatic.com/media/f2f928_67b5166d2b4a4f39bcc4542f5c9bf60b~mv2.jpg",
     expandableCopy:
       "We always confirm the ductwork during your free Pre-Install Verification appointment, to make sure that your existing ducts can provide the best comfort with your new system!",
     onSelect: () => renderDesiredDuctedSystem(),
   },
   {
     label: "I believe that some or all of my ductwork may need to be replaced.",
-    image: "https://1drv.ms/u/c/b0a9e4f44f1af7a3/IQQspNbDElZVQK8st5E93Qk2ATbl_XA1HmU5N_GXszsiFLk?width=660",
+    image: "https://static.wixstatic.com/media/f2f928_33f733644e07493c8fbfa316e8615fb9~mv2.jpeg",
     onSelect: () => renderContactPage(),
   },
 ];
@@ -58,17 +58,17 @@ const gasEfficiencyOptions = [
   {
     key: "standard",
     label: "Standard Efficiency Gas Furnace",
-    image: "assets/gas-standard-efficiency.svg",
+    image: "https://static.wixstatic.com/media/f2f928_f9f434dd801a4b9bb392adde03a43429~mv2.png",
   },
   {
     key: "high",
     label: "High Efficiency Gas Furnace",
-    image: "assets/gas-high-efficiency.svg",
+    image: "https://static.wixstatic.com/media/f2f928_9b366de40bbf4624b95d451d54ec4bab~mv2.jpeg",
   },
   {
     key: "upgrade",
     label: "I have a Standard Gas Furnace But I want a High Efficiency Upgrade",
-    image: "assets/gas-high-upgrade.svg",
+    image: "https://static.wixstatic.com/media/f2f928_6a13520d06104319b9cf8674ece135e7~mv2.png",
   },
 ];
 
