@@ -9,7 +9,8 @@ const systemsWithDuctwork = [
   { label: "Heat Pump System", image: "https://static.wixstatic.com/media/f2f928_4bcc05fad65f4c83a96be046c5173a6f~mv2.jpg", fuelType: "electric", targetType: "Heat Pump" },
   {
     label: "A/C and Gas Furnace",
-    image: "https://static.wixstatic.com/media/f2f928_e11c429615c446569bb29f60f571c195~mv2.jpeg",
+    image: "https://static.wixstatic.com/media/f2f928_3eb31471ad93436fbc41fe89461ea2c1~mv2.png",
+    desiredImage: "https://static.wixstatic.com/media/f2f928_6d291e542dd14a6185dbb522a6c97de1~mv2.png",
     fuelType: "gas",
     targetType: "Gas Furnace",
   },
@@ -37,7 +38,7 @@ const systemsWithoutDuctwork = [
 const ductConditionOptions = [
   {
     label: "Yes, I believe my ductwork is in usable condition.",
-    image: "https://static.wixstatic.com/media/f2f928_1ecf3d68edbe4deba7da9da7fcb7d411~mv2.jpg",
+    image: "https://static.wixstatic.com/media/f2f928_25efaf4cad37442b919a7cb53376146f~mv2.png",
     onSelect: () => renderDesiredDuctedSystem(),
   },
   {
@@ -74,6 +75,7 @@ const gasEfficiencyOptions = [
 
 const desiredDuctedSystems = systemsWithDuctwork.map((item) => ({
   ...item,
+  image: item.desiredImage || item.image,
   label: `${item.label} (Using Your Existing Ductwork)`,
 }));
 
@@ -435,31 +437,48 @@ function renderOtherDesiredDuctedSystems() {
 
 function renderDesiredDuctedSystem() {
   const directReplacementOption = desiredDuctedSystems.find((option) => isDirectReplacement(option));
-  const somethingElseImage =
-    systemsWithDuctwork.find((option) => option.label === "Not Sure")?.image || directReplacementOption?.image;
 
   if (directReplacementOption && state.currentSystem !== "Not Sure") {
-    renderThumbnailQuestion({
-      title: "What type of system are you looking to get installed?",
-      subtitle:
-        "Most homeowners replace their system with a like-for-like option. Choose the direct replacement below, or select Something Else to see all other options.",
-      options: [
-        {
-          ...directReplacementOption,
-          cardClass: "thumbnail-card--featured-direct",
-          onClick: () => selectDesiredDuctedSystem(directReplacementOption),
-        },
-        {
-          label: "Something Else",
-          image: somethingElseImage,
-          cardClass: "thumbnail-card--something-else",
-          onClick: () => renderOtherDesiredDuctedSystems(),
-        },
-      ],
-      onBack: renderDuctCondition,
-      highlightMatcher: (option) => option.label === directReplacementOption.label,
-      cardClass: "thumbnail-grid--featured-direct",
-    });
+    clearWizard();
+    const title = document.createElement("h2");
+    title.className = "panel-title";
+    title.textContent = "What type of system are you looking to get installed?";
+
+    const subtitle = document.createElement("p");
+    subtitle.className = "panel-subtitle";
+    subtitle.textContent =
+      "Most homeowners replace their system with a like-for-like option. Choose the direct replacement below, or select the button underneath to see all other options.";
+
+    const grid = document.createElement("div");
+    grid.className = "thumbnail-grid thumbnail-grid--featured-direct";
+
+    const directCard = createThumbnailCard(
+      {
+        ...directReplacementOption,
+        cardClass: "thumbnail-card--featured-direct",
+      },
+      (option) => option.label === directReplacementOption.label,
+    );
+    directCard.addEventListener("click", () => selectDesiredDuctedSystem(directReplacementOption));
+    grid.appendChild(directCard);
+
+    const actions = document.createElement("div");
+    actions.className = "featured-direct-actions";
+
+    const somethingElseButton = document.createElement("button");
+    somethingElseButton.type = "button";
+    somethingElseButton.className = "secondary-btn featured-direct-secondary-btn";
+    somethingElseButton.textContent = "I’m looking for something else to replace my existing unit";
+    somethingElseButton.addEventListener("click", renderOtherDesiredDuctedSystems);
+
+    const backButton = document.createElement("button");
+    backButton.type = "button";
+    backButton.className = "secondary-btn";
+    backButton.textContent = "Back";
+    backButton.addEventListener("click", renderDuctCondition);
+
+    actions.append(somethingElseButton, backButton);
+    wizard.append(title, subtitle, grid, actions);
     return;
   }
 
