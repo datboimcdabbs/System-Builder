@@ -114,6 +114,7 @@ const state = {
   knowsCurrentSize: null,
   currentKnownCoolingSize: null,
   currentKnownFurnaceSize: null,
+  systemLocation: null,
 };
 
 function clearWizard() {
@@ -228,6 +229,7 @@ function resetDuctedPathState() {
   state.knowsCurrentSize = null;
   state.currentKnownCoolingSize = null;
   state.currentKnownFurnaceSize = null;
+  state.systemLocation = null;
 }
 
 function renderStart() {
@@ -300,6 +302,7 @@ function resetSizingInputs() {
   state.knowsCurrentSize = null;
   state.currentKnownCoolingSize = null;
   state.currentKnownFurnaceSize = null;
+  state.systemLocation = null;
 }
 
 function selectDesiredDuctedSystem(option) {
@@ -332,7 +335,87 @@ function continueToSizingFlow() {
     return;
   }
 
+  if (shouldAskSystemLocationQuestion()) {
+    renderSystemLocationQuestion();
+    return;
+  }
+
   renderHomeSizeQuestion();
+}
+
+function shouldAskSystemLocationQuestion() {
+  if (!state.desiredSystem) {
+    return false;
+  }
+
+  return isHeatPumpSelection() || state.desiredSystem.targetType === "Fan Coil" || isSplitACAndFurnaceSelection() || isFurnaceOnlySelection();
+}
+
+function getSystemLocationOptions() {
+  if (!shouldAskSystemLocationQuestion()) {
+    return [];
+  }
+
+  if (isFurnaceOnlySelection()) {
+    return [
+      { label: "Furnace Unit in Attic", value: "furnace_attic" },
+      { label: "Furnace Unit in Basement", value: "furnace_basement" },
+    ];
+  }
+
+  return [
+    { label: "Outdoor Unit and Indoor Unit in Attic", value: "split_attic" },
+    { label: "Outdoor Unit and Indoor Unit in Basement", value: "split_basement" },
+  ];
+}
+
+function renderSystemLocationQuestion() {
+  clearWizard();
+  const options = getSystemLocationOptions();
+  const buttons = options
+    .map(
+      (option) => `
+        <button
+          class="${state.systemLocation === option.value ? "primary-btn selected-size-btn" : "secondary-btn"} glowing-btn"
+          type="button"
+          data-role="system-location"
+          data-location="${option.value}"
+        >
+          ${option.label}
+        </button>
+      `,
+    )
+    .join("");
+
+  wizard.innerHTML = `
+    <h2 class="panel-title">Do you know your system’s location?</h2>
+    <p class="panel-subtitle">Choose the option that best matches your setup.</p>
+    <div class="know-size-block">
+      <div class="option-row">${buttons}</div>
+    </div>
+    <button class="secondary-btn" type="button" data-role="back-button">Back</button>
+  `;
+
+  wizard.querySelectorAll('button[data-role="system-location"]').forEach((button) => {
+    button.addEventListener("click", () => {
+      state.systemLocation = button.getAttribute("data-location");
+      renderHomeSizeQuestion();
+    });
+  });
+
+  wizard.querySelector('[data-role="back-button"]').addEventListener("click", () => {
+    if (isGasSystemSelection()) {
+      renderGasEfficiencyQuestion();
+      return;
+    }
+
+    if (state.conversionPageTitle) {
+      renderSystemConversionPage();
+      return;
+    }
+
+    renderDesiredDuctedSystem();
+  });
 }
 
 function renderOtherDesiredDuctedSystems() {
@@ -448,7 +531,7 @@ function renderGasEfficiencyQuestion() {
         }
 
         state.gasEfficiency = option.key;
-        renderHomeSizeQuestion();
+        continueToSizingFlow();
       },
     })),
     onBack: () => {
@@ -477,7 +560,7 @@ function renderHighEfficiencyUpgradePage() {
     </div>
   `;
 
-  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", renderHomeSizeQuestion);
+  wizard.querySelector('[data-role="to-sizing"]').addEventListener("click", continueToSizingFlow);
   wizard.querySelector('[data-role="to-efficiency"]').addEventListener("click", renderGasEfficiencyQuestion);
 }
 
@@ -544,6 +627,11 @@ function renderHomeSizeQuestion() {
   const coolingOptions = ["1.5 ton", "2 ton", "2.5 ton", "3 ton", "3.5 ton", "4 ton", "5 ton"];
   const furnaceOptions = ["40,000 BTU", "60,000 BTU", "80,000 BTU", "100,000 BTU", "120,000 BTU"];
 
+  function updateKnowSizeModeButtons(isKnownSize) {
+    knowYesBtn.className = `${isKnownSize ? "primary-btn selected-size-btn" : "secondary-btn"} glowing-btn`;
+    knowNoBtn.className = `${isKnownSize ? "secondary-btn" : "primary-btn selected-size-btn"} glowing-btn`;
+  }
+
   function renderKnownSizeSelectors() {
     let markup = "";
     if (shouldShowCoolingOptions) {
@@ -583,6 +671,7 @@ function renderHomeSizeQuestion() {
 
   function enableKnownSizeMode() {
     state.knowsCurrentSize = true;
+    updateKnowSizeModeButtons(true);
     sqftWrapper.hidden = true;
     input.required = false;
     knownSizeSelections.hidden = false;
@@ -591,6 +680,7 @@ function renderHomeSizeQuestion() {
 
   function enableSquareFootageMode() {
     state.knowsCurrentSize = false;
+    updateKnowSizeModeButtons(false);
     state.currentKnownCoolingSize = null;
     state.currentKnownFurnaceSize = null;
     knownSizeSelections.hidden = true;
@@ -598,13 +688,13 @@ function renderHomeSizeQuestion() {
     input.required = true;
   }
 
-  if (state.knowsCurrentSize === true) {
-    enableKnownSizeMode();
-  } else {
+  if (state.knowsCurrentSize === false) {
     enableSquareFootageMode();
     if (state.homeSquareFeet) {
       input.value = state.homeSquareFeet;
     }
+  } else {
+    enableKnownSizeMode();
   }
 
   knowYesBtn.addEventListener("click", enableKnownSizeMode);
@@ -631,6 +721,11 @@ function renderHomeSizeQuestion() {
   });
 
   wizard.querySelector('[data-role="back-button"]').addEventListener("click", () => {
+    if (shouldAskSystemLocationQuestion()) {
+      renderSystemLocationQuestion();
+      return;
+    }
+
     if (isGasSystemSelection()) {
       renderGasEfficiencyQuestion();
       return;
@@ -933,6 +1028,16 @@ function renderFinalStep() {
 
   if (state.currentKnownFurnaceSize) {
     summary.push(`Known current furnace size: ${state.currentKnownFurnaceSize}.`);
+  }
+
+  if (state.systemLocation === "split_attic") {
+    summary.push("System location: Outdoor unit and indoor unit in attic.");
+  } else if (state.systemLocation === "split_basement") {
+    summary.push("System location: Outdoor unit and indoor unit in basement.");
+  } else if (state.systemLocation === "furnace_attic") {
+    summary.push("System location: Furnace unit in attic.");
+  } else if (state.systemLocation === "furnace_basement") {
+    summary.push("System location: Furnace unit in basement.");
   }
 
   if (state.gasEfficiency === "standard") {
