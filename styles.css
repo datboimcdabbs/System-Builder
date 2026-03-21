@@ -159,6 +159,33 @@ textarea {
   font-weight: 700;
 }
 
+
+.thumbnail-grid--portrait-systems {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.thumbnail-grid--portrait-systems .thumbnail-card {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.thumbnail-grid--portrait-systems .thumbnail-card img {
+  height: 260px;
+}
+
+@media (max-width: 900px) {
+  .thumbnail-grid--portrait-systems {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .thumbnail-grid--portrait-systems {
+    grid-template-columns: 1fr;
+  }
+}
+
 .thumbnail-grid--duct-condition {
   grid-template-columns: 1fr;
 }

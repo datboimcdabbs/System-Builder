@@ -241,6 +241,7 @@ function renderCurrentSystemQuestion() {
       },
     })),
     onBack: renderStart,
+    cardClass: "thumbnail-grid--portrait-systems",
   });
 }
 
@@ -306,6 +307,7 @@ function renderDesiredDuctedSystem() {
     })),
     onBack: renderDuctCondition,
     highlightMatcher: (option) => isDirectReplacement(option),
+    cardClass: "thumbnail-grid--portrait-systems",
   });
 }
 
